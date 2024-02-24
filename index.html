@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chaotic Pendulum</title>
+    <link rel="stylesheet" href="./style.css">
+    <script src="./main.js" defer></script>
+</head>
+<body>
+    <main>
+        <div class="pendulum-info">
+            <div class="inputs">
+                <button type="button" class="button" id="btnAddPart">Add part</button>
+                <label>
+                    Max dots:
+                    <input type="number" id="inputMaxDots" min="0">
+                </label>
+            </div>
+
+            <div class="pendulum-parts"></div>
+        </div>
+
+        <div class="pendulum-control">
+            <button type="button" id="btnPlay">Play</button>
+            <button type="button" id="btnStop">Stop</button>
+        </div>
+
+        <div class="canvas-container">
+            <canvas height="400" width="800" id="chaotic-pendulum-canvas"></canvas>
+        </div>
+    </main>
+</body>
+</html>

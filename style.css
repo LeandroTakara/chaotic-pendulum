@@ -1,0 +1,118 @@
+* {
+    padding: 0;
+    border: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: rgb(32, 32, 32);
+    overflow: hidden;
+}
+
+button {
+    cursor: pointer;
+}
+
+input[type="color"] {
+    cursor: pointer;
+}
+
+main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.pendulum-info {
+    width: 800px;
+    height: 200px;
+    padding: 20px;
+    margin: 20px;
+    background-color: white;
+}
+
+.inputs {
+    height: 30%;
+    border-bottom: solid 3px black;
+    padding-bottom: 4px;
+}
+
+.button {
+    padding: 10px 20px;
+    background-color: rgb(213, 213, 213);
+    transition: background-color .3s;
+}
+
+.button:hover {
+    background-color: rgb(183, 183, 183);
+}
+
+.pendulum-parts {
+    height: 70%;
+    overflow-y: auto;
+}
+
+.pendulum {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 30px;
+    padding: 4px 10px;
+    margin-top: 10px;
+    border: solid black 3px;
+    border-radius: 30px;
+    background-color: rgb(240, 240, 240);
+}
+
+.input-pendulum-color-wrapper {
+    position: relative;
+    width: 20px;
+    height: 20px;
+    overflow: hidden;
+    border: solid black 2px;
+    border-radius: 100%;
+}
+
+.input-pendulum-color {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 200%;
+    height: 200%;
+    translate: -50% -50%;
+}
+
+.input-pendulum-attribute {
+    width: 80px;
+    padding: 4px;
+}
+
+.btnRemovePendulum {
+    position: relative;
+    width: 10px;
+    height: 10px;
+}
+
+.btnRemovePendulum::before, .btnRemovePendulum::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    translate: -50% -50%;
+    width: 15px;
+    height: 5px;
+    background-color: red;
+}
+
+.btnRemovePendulum::before {
+    rotate: -45deg;
+}
+
+.btnRemovePendulum::after {
+    rotate: 45deg;
+}
+
+.canvas-container {
+    margin: 20px;
+}
