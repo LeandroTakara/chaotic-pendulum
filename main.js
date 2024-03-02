@@ -1,217 +1,359 @@
+/**
+ * It resembles a pendulum in the sense that it moves in a circular motion and has some object at its end.
+ * 
+ * It can be connected to another "pendulum" and any changes made to startX, startY, length or radians properties are updated in the connections until the last "pendulum"
+ */
 class Pendulum {
-    constructor(ctx, x, y, speed, length, radians) {
+    // auto update properties, when any of them is changed the next pendulums are also changed
+    #startX
+    #startY
+    #length
+    #radians
+
+    /** @type {Pendulum} */
+    next
+
+    /**
+     * @param {CanvasRenderingContext2D} ctx canvas 2d context
+     * @param {number} startX start x coordinate
+     * @param {number} startY start y coordinate
+     * @param {number} length pendulum length
+     * @param {number} angularSpeed pendulum angular speed
+     * @param {number} [radians = 0] start radians
+     */
+    constructor(ctx, startX, startY, length, angularSpeed, radians = 0) {
         this.ctx = ctx
-        this.x = x
-        this.y = y
-        this.speed = speed
-        this.length = length
-        this.radians = radians
-        this.color = '#ffffff'
+        this.#startX = startX
+        this.#startY = startY
+        this.#length = length
+        this.angularSpeed = angularSpeed
+        this.#radians = radians
+
+        this.lineColor = '#ffffff'
+        this.lineThickness = 3
+
+        this.ballColor = '#ffffff'
+        this.ballRadius = 3
+
+        this.next = null
+    }
+
+    get startX() {
+        return this.#startX
+    }
+
+    set startX(value) {
+        this.#startX = value
+
+        this.#propagateChanges()
+    }
+
+    get startY() {
+        return this.#startY
+    }
+
+    set startY(value) {
+        this.#startY = value
+
+        this.#propagateChanges()
     }
 
     get endX() {
-        return this.x + Math.cos(this.radians) * this.length
+        return this.startX + Math.cos(this.radians) * this.length
     }
-    
+
     get endY() {
-        return this.y + Math.sin(this.radians) * this.length
+        return this.startY + Math.sin(this.radians) * this.length
     }
 
-    draw() {
-        this.ctx.save()
+    get length() {
+        return this.#length
+    }
 
+    set length(value) {
+        this.#length = value
+
+        this.#propagateChanges()
+    }
+
+    get radians() {
+        return this.#radians
+    }
+
+    set radians(value) {
+        this.#radians = value
+
+        this.#propagateChanges()
+    }
+
+    /**
+     * It propagates the changes made to startX, startY, length or radians properties to the next element and so on until the last element
+     */
+    #propagateChanges() {
+        if (this.next) {
+            this.next.startX = this.endX
+            this.next.startY = this.endY
+            
+            this.next.#propagateChanges()
+        }
+    }
+
+    /**
+     * Draws the pendulum
+     */
+    draw() {
+        // draw a line connecting the start position to the end
+        this.ctx.save()
         this.ctx.beginPath()
-        this.ctx.strokeStyle = this.color
-        this.ctx.lineWidth = 3
-        this.ctx.moveTo(this.x, this.y)
+        this.ctx.strokeStyle = this.lineColor
+        this.ctx.lineWidth = this.lineThickness
+        this.ctx.moveTo(this.startX, this.startY)
         this.ctx.lineTo(this.endX, this.endY)
         this.ctx.stroke()
         this.ctx.closePath()
-
-        this.ctx.beginPath()
-        this.ctx.fillStyle = 'white'
-        this.ctx.arc(this.endX, this.endY, 3, 0, FULL_RADIANS)
-        this.ctx.fill()
-        this.ctx.closePath()
-
         this.ctx.restore()
-    }
 
-    update() {
-        this.radians += this.speed * 0.01
-    }
-}
-
-class ChaoticPendulum {
-    #maxDots
-
-    constructor(ctx, x, y) {
-        this.ctx = ctx
-        this.x = x
-        this.y = y
-
-        this.pendulums = []
-
-        this.#maxDots = 10
-        this.dots = []
-    }
-
-    get maxDots() {
-        return this.#maxDots
-    }
-
-    set maxDots(value) {
-        this.#maxDots = value
-        this.dots = this.dots.slice(0, value)
-    }
-
-    get opacityDecreaseRate() {
-        return 1 / this.maxDots
-    }
-
-    get endX() {
-        return this.pendulums[this.pendulums.length - 1]?.endX || this.x
-    }
-    
-    get endY() {
-        return this.pendulums[this.pendulums.length - 1]?.endY || this.y
-    }
-
-    createPendulum(speed, length, radians) {
-        const pendulum = new Pendulum(this.ctx, this.endX, this.endY, speed, length, radians)
-        this.pendulums.push(pendulum)
-        return pendulum
-    }
-
-    draw() {
-        this.pendulums.forEach(pendulum => pendulum.draw())
-        this.dots.forEach(dot => dot.draw())
-    }
-
-    update() {
-        let curX = this.x
-        let curY = this.y
-
-        this.pendulums.forEach(pendulum => {
-            // update the pendulum position
-            pendulum.x = curX
-            pendulum.y = curY
-
-            pendulum.update()
-
-            // get the current pendulum position to set to the next one
-            curX = pendulum.endX
-            curY = pendulum.endY
-        })
-
-        this.dots.forEach((dot, i) => dot.opacity = 1 - this.opacityDecreaseRate * i)
-
-        this.createGhostDot(curX, curY)
-    }
-
-    createGhostDot(x, y) {
-        this.dots.unshift(new Dot(this.ctx, x, y))
-
-        if (this.dots.length > this.maxDots) {
-            this.dots.pop()
-        }
-    }
-
-    removePendulum(pendulum) {
-        const pendulumIndex = this.pendulums.indexOf(pendulum)
-
-        if (this.pendulums[pendulumIndex + 1]) {
-            this.pendulums[pendulumIndex + 1].x = pendulum.x
-            this.pendulums[pendulumIndex + 1].y = pendulum.y
-        }
-
-        for (let i = pendulumIndex + 2; i < this.pendulums.length; i++) {
-            this.pendulums[i].x = this.pendulums[i - 1].endX
-            this.pendulums[i].y = this.pendulums[i - 1].endY
-        }
-
-        this.pendulums.splice(pendulumIndex, 1)
-    }
-
-    changeLength(pendulum, length) {
-        const pendulumIndex = this.pendulums.indexOf(pendulum)
-        pendulum.length = length
-
-        for (let i = pendulumIndex + 1; i < this.pendulums.length; i++) {
-            this.pendulums[i].x = this.pendulums[i - 1].endX
-            this.pendulums[i].y = this.pendulums[i - 1].endY
-        }
-    }
-
-    changeRadians(pendulum, radians) {
-        const pendulumIndex = this.pendulums.indexOf(pendulum)
-        pendulum.radians = radians
-
-        for (let i = pendulumIndex + 1; i < this.pendulums.length; i++) {
-            this.pendulums[i].x = this.pendulums[i - 1].endX
-            this.pendulums[i].y = this.pendulums[i - 1].endY
-        }
-    }
-}
-
-class Dot {
-    constructor(ctx, x, y) {
-        this.ctx = ctx
-        this.x = x
-        this.y = y
-        this.opacity = 1
-    }
-
-    draw() {
-        this .ctx.save()
-        this.ctx.globalAlpha = this.opacity
-        this.ctx.fillStyle = 'white'
+        // draw the ball on the end position
+        this.ctx.save()
         this.ctx.beginPath()
-        this.ctx.arc(this.x, this.y, 3, 0, FULL_RADIANS)
+        this.ctx.fillStyle = this.ballColor
+        this.ctx.arc(this.endX, this.endY, this.ballRadius, 0, FULL_RADIANS)
         this.ctx.fill()
         this.ctx.closePath()
         this.ctx.restore()
+    }
+
+    /**
+     * Updates the position of the pendulum and subsequent pendulums
+     */
+    update() {
+        // angularSpeed is multiplied by a tenth to divide 1 radian into 100 parts (not necessary)
+        this.radians += this.angularSpeed * 0.01
+
+        // updates the next element if it exists
+        if (this.next) {
+            this.next.startX = this.endX
+            this.next.startY = this.endY
+            
+            this.next.update()
+        }
     }
 }
 
 /**
- * @param {number} speed 
- * @param {number} length 
+ * It controls the Pendulum and Trail class
+ */
+class ChaoticPendulum {
+    #maxTrails
+
+    // acts like a queue
+    /** @type {MyTrail[]} */
+    trails
+
+    /** @type {Pendulum} */
+    firstPendulum
+
+    /** @type {Pendulum} */
+    lastPendulum
+
+    /**
+     * @param {CanvasRenderingContext2D} ctx canvas 2d context
+     * @param {number} x x coordinate
+     * @param {number} y y coordinate
+     */
+    constructor(ctx, x, y) {
+        this.ctx = ctx
+        this.x = x
+        this.y = y
+
+        this.#maxTrails = 10
+        this.trails = []
+
+        this.firstPendulum = null
+        this.lastPendulum = null
+    }
+
+    get maxTrail() {
+        return this.#maxTrails
+    }
+
+    set maxTrail(value) {
+        this.#maxTrails = value
+
+        // removes the excess trail
+        this.trails.splice(value)
+    }
+
+    /**
+     * Creates a pendulum, appends it to the pendulum chain and returns it
+     * @param {number} length pendulum length
+     * @param {number} angularSpeed pendulum angular speed
+     * @param {number} radians start radians
+     */
+    createPendulum(length, angularSpeed, radians) {
+        let pendulum = null
+        
+        if (this.firstPendulum === null) {
+            pendulum = new Pendulum(this.ctx, this.x, this.y, length, angularSpeed, radians)
+            this.firstPendulum = pendulum
+            this.lastPendulum = pendulum
+        } else {
+            pendulum = new Pendulum(this.ctx, this.lastPendulum.endX, this.lastPendulum.endY, length, angularSpeed, radians)
+            this.lastPendulum.next = pendulum
+            this.lastPendulum = this.lastPendulum.next
+        }
+        
+        return pendulum
+    }
+
+    /**
+     * Removes a pendulum from the pendulum chain
+     * @param {Pendulum} pendulum pendulum to be removed
+     */
+    removePendulum(pendulum) {
+        if (pendulum === this.firstPendulum) {
+            this.firstPendulum = this.firstPendulum.next
+
+            this.firstPendulum.startX = pendulum.startX
+            this.firstPendulum.startY = pendulum.startY
+        } else {
+            let runner = this.firstPendulum
+
+            while (runner.next !== pendulum) {
+                runner = runner.next
+            }
+
+            runner.next = pendulum.next
+
+            runner.next.startX = runner.endX
+            runner.next.startY = runner.endY
+
+            if (pendulum === this.lastPendulum) {
+                this.lastPendulum = runner
+            }
+        }
+    }
+
+    /**
+     * Draws the entire pendulum chain and the trails
+     */
+    draw() {
+        let runner = this.firstPendulum
+
+        while (runner) {
+            runner.draw()
+            runner = runner.next
+        }
+
+        this.trails.forEach(trail => trail.draw())
+    }
+
+    /**
+     * Updates the entire pendulum chain and 
+     */
+    update() {
+        // updates the pendulum chain
+        this.firstPendulum?.update()
+
+        // updates and creates a trail
+        this.trails.forEach((trail, i) => trail.setOpacityValue(i, this.maxTrail))    
+        this.#createTrail(this.lastPendulum.endX, this.lastPendulum.endY, this.lastPendulum.ballRadius)
+    }
+
+    /**
+     * @param {number} x x coordinate
+     * @param {number} y y coordinate
+     * @param {number} radius radius
+     */
+    #createTrail(x, y, radius) {
+        // appends the trail to the start
+        if (this.trails.length < this.maxTrail) {
+            this.trails.unshift(new MyTrail(this.ctx, x, y, radius))
+        }
+
+        // removes the last trail
+        if (this.trails.length === this.maxTrail) {
+            this.trails.pop()
+        }
+    }
+}
+
+class MyTrail {
+    /**
+     * @param {CanvasRenderingContext2D} ctx canvas 2d context
+     * @param {number} x x coordinate
+     * @param {number} y y coordinate
+     * @param {number} radius radius
+     */
+    constructor(ctx, x, y, radius) {
+        this.ctx = ctx
+        this.x = x
+        this.y = y
+        this.radius = radius
+
+        this.color = '#ffffff'
+        this.opacity = 1
+    }
+
+    /**
+     * Draws the trail
+     */
+    draw() {
+        this.ctx.save()
+        this.ctx.globalAlpha = this.opacity
+        this.ctx.fillStyle = this.color
+        this.ctx.beginPath()
+        this.ctx.arc(this.x, this.y, this.radius, 0, FULL_RADIANS)
+        this.ctx.fill()
+        this.ctx.closePath()
+        this.ctx.restore()
+    }
+
+    /**
+     * @param {number} t time elapsed since it was created
+     * @param {number} n max number of trails
+     */
+    setOpacityValue(t, n) {
+        this.opacity = 1 - t / n
+    }
+}
+
+/**
+ * @param {Pendulum} pendulum 
  */
 function createHTMLPendulum(pendulum) {
     const divContainer = document.createElement('div')
     divContainer.className = 'pendulum'
 
     // create the pendulum attributes
-
     const wrapperInputColor = document.createElement('div')
     wrapperInputColor.className = 'input-pendulum-color-wrapper'
 
     const inputColor = document.createElement('input')
     inputColor.type = 'color'
-    inputColor.value = pendulum.color
+    inputColor.value = pendulum.lineColor
     inputColor.className = 'input-pendulum-color'
     inputColor.addEventListener('input', function() {
-        pendulum.color = inputColor.value
+        pendulum.lineColor = inputColor.value
         draw()
     })
 
     wrapperInputColor.appendChild(inputColor)
 
-    const elementSpeed = createHTMLPendulumAttribute('Speed', pendulum.speed)
+    const elementSpeed = createHTMLPendulumAttribute('Speed', pendulum.angularSpeed)
     elementSpeed.input.addEventListener('input', function() {
-        pendulum.speed = parseFloat(elementSpeed.input.value || 0)
+        pendulum.angularSpeed = parseFloat(elementSpeed.input.value || 0)
     })
 
     const elementLength = createHTMLPendulumAttribute('Length', pendulum.length)
     elementLength.input.addEventListener('input', function() {
-        chaoticPendulum.changeLength(pendulum, parseFloat(elementLength.input.value) || 0)
+        pendulum.length = parseFloat(elementLength.input.value) || 0
         draw()
     })
 
     const elementRadians = createHTMLPendulumAttribute('Degrees', toDegrees(pendulum.radians))
     elementRadians.input.addEventListener('input', function() {
-        chaoticPendulum.changeRadians(pendulum, toRadians(parseFloat(elementRadians.input.value) || 0))
+        pendulum.radians = toRadians(parseFloat(elementRadians.input.value) || 0)
         draw()
     })
 
@@ -235,6 +377,11 @@ function createHTMLPendulum(pendulum) {
     return divContainer
 }
 
+/**
+ * @param {string} name label text
+ * @param {number} value initial value
+ * @returns 
+ */
 function createHTMLPendulumAttribute(name, value) {
     const label = document.createElement('label')
     label.innerText = name + ': '
@@ -250,7 +397,7 @@ function createHTMLPendulumAttribute(name, value) {
 }
 
 function createPendulum() {
-    const pendulum = chaoticPendulum.createPendulum(DEFAULT_PENDULUM_SPEED, DEFAULT_PENDULUM_LENGTH, DEFAULT_PENDULUM_RADIANS)
+    const pendulum = chaoticPendulum.createPendulum(DEFAULT_PENDULUM_LENGTH, DEFAULT_PENDULUM_SPEED, DEFAULT_PENDULUM_RADIANS)
 
     const HTMLPendulum = createHTMLPendulum(pendulum)
 
@@ -325,10 +472,11 @@ btnAddPart.addEventListener('click', function() {
     draw()
 })
 
-const inputMaxDots = document.getElementById('inputMaxDots')
-inputMaxDots.value = chaoticPendulum.maxDots
-inputMaxDots.addEventListener('input', function() {
-    chaoticPendulum.maxDots = parseInt(inputMaxDots.value) || 0
+const inputMaxTrail = document.getElementById('inputMaxTrail')
+inputMaxTrail.value = chaoticPendulum.maxTrail
+inputMaxTrail.addEventListener('input', function() {
+    chaoticPendulum.maxTrail = parseInt(inputMaxTrail.value) || 0
+    draw()
 })
 
 const btnPlay = document.getElementById('btnPlay')
