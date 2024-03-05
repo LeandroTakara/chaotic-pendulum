@@ -1,7 +1,7 @@
 /**
- * It resembles a pendulum in the sense that it moves in a circular motion and has some object at its end.
+ * It resembles a pendulum in the sense that it moves in a circular motion and it might have another pendulum at its end.
  * 
- * It can be connected to another "pendulum" and any changes made to startX, startY, length or radians properties are updated in the connections until the last "pendulum"
+ * It can be connected to another pendulum and any changes made to startX, startY, length, radians or next properties are updated in the connections until the last pendulum
  */
 class Pendulum {
     // auto update properties, when any of them is changed the next pendulums are also changed
@@ -9,9 +9,8 @@ class Pendulum {
     #startY
     #length
     #radians
-
     /** @type {Pendulum} */
-    next
+    #next
 
     /**
      * @param {CanvasRenderingContext2D} ctx canvas 2d context
@@ -35,7 +34,7 @@ class Pendulum {
         this.ballColor = '#ffffff'
         this.ballRadius = 3
 
-        this.next = null
+        this.#next = null
     }
 
     get startX() {
@@ -86,16 +85,33 @@ class Pendulum {
         this.#propagateChanges()
     }
 
+    get next() {
+        return this.#next
+    }
+
+    set next(value) {
+        this.#next = value
+
+        this.#propagateChanges()
+    }
+
     /**
-     * It propagates the changes made to startX, startY, length or radians properties to the next element and so on until the last element
+     * Sets the new start position of the pendulum
+     * @param {number} startX new x coordinate
+     * @param {number} startY new y coordinate
+     */
+    setPosition(startX, startY) {
+        this.#startX = startX
+        this.#startY = startY
+
+        this.#propagateChanges()
+    }
+
+    /**
+     * It propagates the changes made to the startX, startY, length, radians or next properties to the next element and so on until the last one
      */
     #propagateChanges() {
-        if (this.next) {
-            this.next.startX = this.endX
-            this.next.startY = this.endY
-            
-            this.next.#propagateChanges()
-        }
+        this.next?.setPosition(this.endX, this.endY)
     }
 
     /**
@@ -132,8 +148,10 @@ class Pendulum {
 
         // updates the next element if it exists
         if (this.next) {
-            this.next.startX = this.endX
-            this.next.startY = this.endY
+            // updates the next immediate element position without propagating the changes through the chain to avoid unnecessary changes,
+            // because the elements ahead will have a definitely change once their previous element is updated
+            this.next.#startX = this.endX
+            this.next.#startY = this.endY
             
             this.next.update()
         }
@@ -147,12 +165,13 @@ class ChaoticPendulum {
     #maxTrails
 
     // acts like a queue
-    /** @type {MyTrail[]} */
+    /** @type {Trail[]} */
     trails
 
     /** @type {Pendulum} */
     firstPendulum
 
+    // the reference to the last pendulum is used to create the trail
     /** @type {Pendulum} */
     lastPendulum
 
@@ -214,8 +233,7 @@ class ChaoticPendulum {
         if (pendulum === this.firstPendulum) {
             this.firstPendulum = this.firstPendulum.next
 
-            this.firstPendulum.startX = pendulum.startX
-            this.firstPendulum.startY = pendulum.startY
+            this.firstPendulum?.setPosition(pendulum.startX, pendulum.startY)
         } else {
             let runner = this.firstPendulum
 
@@ -224,9 +242,6 @@ class ChaoticPendulum {
             }
 
             runner.next = pendulum.next
-
-            runner.next.startX = runner.endX
-            runner.next.startY = runner.endY
 
             if (pendulum === this.lastPendulum) {
                 this.lastPendulum = runner
@@ -249,15 +264,19 @@ class ChaoticPendulum {
     }
 
     /**
-     * Updates the entire pendulum chain and 
+     * Updates the entire pendulum chain and the trails
      */
     update() {
         // updates the pendulum chain
         this.firstPendulum?.update()
 
-        // updates and creates a trail
-        this.trails.forEach((trail, i) => trail.setOpacityValue(i, this.maxTrail))    
-        this.#createTrail(this.lastPendulum.endX, this.lastPendulum.endY, this.lastPendulum.ballRadius)
+        if (this.firstPendulum) {
+            // updates the trails
+            this.trails.forEach((trail, i) => trail.setOpacityValue(i, this.maxTrail))
+
+            // creates a new trail
+            this.#createTrail(this.lastPendulum.endX, this.lastPendulum.endY, this.lastPendulum.ballRadius)
+        }
     }
 
     /**
@@ -268,7 +287,7 @@ class ChaoticPendulum {
     #createTrail(x, y, radius) {
         // appends the trail to the start
         if (this.trails.length < this.maxTrail) {
-            this.trails.unshift(new MyTrail(this.ctx, x, y, radius))
+            this.trails.unshift(new Trail(this.ctx, x, y, radius))
         }
 
         // removes the last trail
@@ -278,7 +297,7 @@ class ChaoticPendulum {
     }
 }
 
-class MyTrail {
+class Trail {
     /**
      * @param {CanvasRenderingContext2D} ctx canvas 2d context
      * @param {number} x x coordinate
