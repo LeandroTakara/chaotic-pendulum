@@ -337,13 +337,6 @@ class Trail {
     }
 }
 
-function changeInput(pendulum) {
-    return function() {
-        pendulum.angularSpeed = parseFloat(this.value || 0)
-        console.log(pendulum.angularSpeed)
-    }
-}
-
 /**
  * @param {string} attribute 
  * @param {any} initialValue 
@@ -352,14 +345,14 @@ function changeInput(pendulum) {
  */
 function createHTMLPendulumAttributeNumber(attribute, initialValue, inputCallback, reflectCallback = null) {
     const label = document.createElement('label')
-    label.className = 'pendulum-attribute'
+    label.className = 'pendulum-number-attribute'
 
     const span = document.createElement('span')
-    span.className = 'input-info'
+    span.className = 'pendulum-input-info'
     span.innerText = attribute + ':'
 
     const input = document.createElement('input')
-    input.className = 'input input-number'
+    input.className = 'pendulum-input-number'
     input.type = 'number'
     input.value = initialValue
     input.addEventListener('input', e => inputCallback(parseFloat(e.target.value || 0)))
@@ -379,11 +372,11 @@ function createHTMLPendulumAttributeNumber(attribute, initialValue, inputCallbac
  */
 function createHTMLPendulumAttributeColor(iconName, initialValue, inputCallback) {
     const label = document.createElement('label')
-    label.className = 'pendulum-attribute'
+    label.className = 'pendulum-color-attribute'
 
 
-    const iconWrapper = document.createElement('span')
-    iconWrapper.className = 'input-info'
+    const iconWrapper = document.createElement('div')
+    iconWrapper.className = 'icon-wrapper'
 
     const icon = document.createElement('span')
     icon.className = iconName
@@ -392,10 +385,10 @@ function createHTMLPendulumAttributeColor(iconName, initialValue, inputCallback)
 
 
     const inputWrapper = document.createElement('div')
-    inputWrapper.className = 'input input-color-wrapper'
+    inputWrapper.className = 'pendulum-input-color-wrapper'
 
     const input = document.createElement('input')
-    input.className = 'input-color'
+    input.className = 'pendulum-input-color'
     input.type = 'color'
     input.value = initialValue
     input.addEventListener('input', e => inputCallback(e.target.value))
@@ -415,14 +408,18 @@ function createHTMLPendulum(pendulum) {
     const divPendulum = document.createElement('div')
     divPendulum.className = 'pendulum'
 
+    const divPendulumAttributesWrapper = document.createElement('div')
+    divPendulumAttributesWrapper.className = 'pendulum-attributes-wrapper'
+
     const divPendulumAttributes = document.createElement('div')
     divPendulumAttributes.className = 'pendulum-attributes'
-
+    
     const labelSpeed = createHTMLPendulumAttributeNumber('Speed', pendulum.angularSpeed,
         function(value) {
             pendulum.angularSpeed = value
         }
     )
+    labelSpeed.classList.add('attribute-speed')
 
     const labelLength = createHTMLPendulumAttributeNumber('Length', pendulum.length,
         function(value) {
@@ -430,6 +427,7 @@ function createHTMLPendulum(pendulum) {
             draw()
         }
     )
+    labelLength.classList.add('attribute-length')
 
     const labelDegrees = createHTMLPendulumAttributeNumber('Degrees', toDegrees(pendulum.radians),
         function(value) {
@@ -438,6 +436,7 @@ function createHTMLPendulum(pendulum) {
         },
         () => toDegrees(pendulum.radians)
     )
+    labelDegrees.classList.add('attribute-degrees')
 
     const colorsWrapper = document.createElement('div')
     colorsWrapper.className = 'colors-wrapper'
@@ -446,15 +445,13 @@ function createHTMLPendulum(pendulum) {
         pendulum.ballColor = value
         draw()
     })
+    labelBallColor.classList.add('attribute-ball-color')
 
     const labelLineColor = createHTMLPendulumAttributeColor('line-icon', pendulum.lineColor, function(value) {
         pendulum.lineColor = value
         draw()
     })
-
-    colorsWrapper.append(labelBallColor, labelLineColor)
-
-    divPendulumAttributes.append(labelSpeed, labelLength, labelDegrees, colorsWrapper)
+    labelLineColor.classList.add('attribute-line-color')
 
     const btnRemovePendulum = document.createElement('button')
     btnRemovePendulum.type = 'button'
@@ -465,24 +462,20 @@ function createHTMLPendulum(pendulum) {
         draw()
     })
 
-    const btnShow = document.createElement('button')
-    btnShow.type = 'button'
-    btnShow.className = 'btn-show-pendulum'
-    btnShow.addEventListener('click', function() {
-        if (divPendulum.classList.contains('simplified')) {
-            labelSpeed.classList.remove('hidden')
-            labelLength.classList.remove('hidden')
-            labelDegrees.classList.remove('hidden')
-            divPendulum.classList.remove('simplified')
-        } else {
-            labelSpeed.classList.add('hidden')
-            labelLength.classList.add('hidden')
-            labelDegrees.classList.add('hidden')
-            divPendulum.classList.add('simplified')
-        }
+    const btnMinimize = document.createElement('button')
+    btnMinimize.type = 'button'
+    btnMinimize.className = 'btn-minimize-pendulum'
+    btnMinimize.addEventListener('click', function() {
+        divPendulum.classList.toggle('minimized')
     })
 
-    divPendulum.append(divPendulumAttributes, btnRemovePendulum, btnShow)
+    colorsWrapper.append(labelBallColor, labelLineColor)
+
+    divPendulumAttributes.append(labelSpeed, labelLength, labelDegrees, colorsWrapper)
+
+    divPendulumAttributesWrapper.append(divPendulumAttributes)
+
+    divPendulum.append(divPendulumAttributesWrapper, btnRemovePendulum, btnMinimize)
 
     return divPendulum
 }
