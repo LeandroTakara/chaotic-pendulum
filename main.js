@@ -559,7 +559,13 @@ const updateInputs = []
 
 let animationFrame = null
 
+const divPendulumInfo = document.querySelector('.pendulum-info')
 const divPendulumParts = document.querySelector('.pendulum-parts')
+
+const btnClose = document.querySelector('.btn-close')
+btnClose.addEventListener('click', function() {
+    divPendulumInfo.classList.toggle('closed')
+})
 
 const btnAddPart = document.querySelector('.btn-add')
 btnAddPart.addEventListener('click', function() {
