@@ -29,7 +29,7 @@ class Pendulum {
         this.#radians = radians
 
         this.lineColor = '#ffffff'
-        this.lineThickness = 3
+        this.lineWidth = 3
 
         this.ballColor = '#ffffff'
         this.ballRadius = 3
@@ -122,7 +122,7 @@ class Pendulum {
         this.ctx.save()
         this.ctx.beginPath()
         this.ctx.strokeStyle = this.lineColor
-        this.ctx.lineWidth = this.lineThickness
+        this.ctx.lineWidth = this.lineWidth
         this.ctx.moveTo(this.startX, this.startY)
         this.ctx.lineTo(this.endX, this.endY)
         this.ctx.stroke()
@@ -162,6 +162,8 @@ class Pendulum {
  * It controls the Pendulum and Trail class
  */
 class ChaoticPendulum {
+    #x
+    #y
     #maxTrails
 
     // acts like a queue
@@ -182,14 +184,34 @@ class ChaoticPendulum {
      */
     constructor(ctx, x, y) {
         this.ctx = ctx
-        this.x = x
-        this.y = y
+        this.#x = x
+        this.#y = y
 
         this.#maxTrails = 10
         this.trails = []
 
         this.firstPendulum = null
         this.lastPendulum = null
+    }
+
+    get x() {
+        return this.#x
+    }
+
+    set x(value) {
+        this.#x = value
+
+        if (this.firstPendulum) this.firstPendulum.startX = value
+    }
+
+    get y() {
+        return this.#y
+    }
+
+    set y(value) {
+        this.#y = value
+
+        if (this.firstPendulum) this.firstPendulum.startY = value
     }
 
     get maxTrail() {
@@ -338,81 +360,146 @@ class Trail {
 }
 
 /**
- * @param {Pendulum} pendulum 
+ * @param {string} attribute 
+ * @param {any} initialValue 
+ * @param {(value: number) => void} inputCallback 
+ * @param {() => number} [reflectCallback = null]
  */
-function createHTMLPendulum(pendulum) {
-    const divContainer = document.createElement('div')
-    divContainer.className = 'pendulum'
+function createHTMLPendulumAttributeNumber(attribute, initialValue, inputCallback, reflectCallback = null) {
+    const label = document.createElement('label')
+    label.className = 'pendulum-number-attribute'
 
-    // create the pendulum attributes
-    const wrapperInputColor = document.createElement('div')
-    wrapperInputColor.className = 'input-pendulum-color-wrapper'
+    const span = document.createElement('span')
+    span.className = 'pendulum-input-info'
+    span.innerText = attribute + ':'
 
-    const inputColor = document.createElement('input')
-    inputColor.type = 'color'
-    inputColor.value = pendulum.lineColor
-    inputColor.className = 'input-pendulum-color'
-    inputColor.addEventListener('input', function() {
-        pendulum.lineColor = inputColor.value
-        draw()
-    })
+    const input = document.createElement('input')
+    input.className = 'pendulum-input-number'
+    input.type = 'number'
+    input.value = initialValue
+    input.addEventListener('input', e => inputCallback(parseFloat(e.target.value || 0)))
 
-    wrapperInputColor.appendChild(inputColor)
+    if (reflectCallback) updateInputs.push({ input, update: reflectCallback })
 
-    const elementSpeed = createHTMLPendulumAttribute('Speed', pendulum.angularSpeed)
-    elementSpeed.input.addEventListener('input', function() {
-        pendulum.angularSpeed = parseFloat(elementSpeed.input.value || 0)
-    })
+    label.append(span, input)
 
-    const elementLength = createHTMLPendulumAttribute('Length', pendulum.length)
-    elementLength.input.addEventListener('input', function() {
-        pendulum.length = parseFloat(elementLength.input.value) || 0
-        draw()
-    })
-
-    const elementRadians = createHTMLPendulumAttribute('Degrees', toDegrees(pendulum.radians))
-    elementRadians.input.addEventListener('input', function() {
-        pendulum.radians = toRadians(parseFloat(elementRadians.input.value) || 0)
-        draw()
-    })
-
-    updateInputs.push({
-        input: elementRadians.input,
-        update: () => toDegrees(pendulum.radians)
-    })
-
-    const btnRemove = document.createElement('button')
-    btnRemove.type = 'button'
-    btnRemove.className = 'btnRemovePendulum'
-    btnRemove.addEventListener('click', function() {
-        chaoticPendulum.removePendulum(pendulum)
-        divContainer.remove()
-        draw()
-    })
-
-    // append the attributes to the container
-    divContainer.append(wrapperInputColor, elementSpeed.label, elementLength.label, elementRadians.label, btnRemove)
-
-    return divContainer
+    return label
 }
 
 /**
- * @param {string} name label text
- * @param {number} value initial value
+ * @param {string} iconName 
+ * @param {any} initialValue 
+ * @param {(value: number) => void} inputCallback 
  * @returns 
  */
-function createHTMLPendulumAttribute(name, value) {
+function createHTMLPendulumAttributeColor(iconName, initialValue, inputCallback) {
     const label = document.createElement('label')
-    label.innerText = name + ': '
+    label.className = 'pendulum-color-attribute'
+
+
+    const iconWrapper = document.createElement('div')
+    iconWrapper.className = 'icon-wrapper'
+
+    const icon = document.createElement('span')
+    icon.className = iconName
+
+    iconWrapper.appendChild(icon)
+
+
+    const inputWrapper = document.createElement('div')
+    inputWrapper.className = 'pendulum-input-color-wrapper'
 
     const input = document.createElement('input')
-    input.type = 'number'
-    input.className = 'input-pendulum-attribute'
-    input.value = value
+    input.className = 'pendulum-input-color'
+    input.type = 'color'
+    input.value = initialValue
+    input.addEventListener('input', e => inputCallback(e.target.value))
 
-    label.appendChild(input)
+    inputWrapper.appendChild(input)
 
-    return { label, input }
+
+    label.append(iconWrapper, inputWrapper)
+
+    return label
+}
+
+/**
+ * @param {Pendulum} pendulum 
+ */
+function createHTMLPendulum(pendulum) {
+    const divPendulum = document.createElement('div')
+    divPendulum.className = 'pendulum'
+
+    const divPendulumAttributesWrapper = document.createElement('div')
+    divPendulumAttributesWrapper.className = 'pendulum-attributes-wrapper'
+
+    const divPendulumAttributes = document.createElement('div')
+    divPendulumAttributes.className = 'pendulum-attributes'
+    
+    const labelSpeed = createHTMLPendulumAttributeNumber('Speed', pendulum.angularSpeed,
+        function(value) {
+            pendulum.angularSpeed = value
+        }
+    )
+    labelSpeed.classList.add('attribute-speed')
+
+    const labelLength = createHTMLPendulumAttributeNumber('Length', pendulum.length,
+        function(value) {
+            pendulum.length = value
+            draw()
+        }
+    )
+    labelLength.classList.add('attribute-length')
+
+    const labelDegrees = createHTMLPendulumAttributeNumber('Degrees', toDegrees(pendulum.radians),
+        function(value) {
+            pendulum.radians = toRadians(value)
+            draw()
+        },
+        () => toDegrees(pendulum.radians)
+    )
+    labelDegrees.classList.add('attribute-degrees')
+
+    const colorsWrapper = document.createElement('div')
+    colorsWrapper.className = 'colors-wrapper'
+
+    const labelBallColor = createHTMLPendulumAttributeColor('ball-icon', pendulum.ballColor, function(value) {
+        pendulum.ballColor = value
+        draw()
+    })
+    labelBallColor.classList.add('attribute-ball-color')
+
+    const labelLineColor = createHTMLPendulumAttributeColor('line-icon', pendulum.lineColor, function(value) {
+        pendulum.lineColor = value
+        draw()
+    })
+    labelLineColor.classList.add('attribute-line-color')
+
+    const btnRemovePendulum = document.createElement('button')
+    btnRemovePendulum.type = 'button'
+    btnRemovePendulum.className = 'btn-close-pendulum'
+    btnRemovePendulum.addEventListener('click', function() {
+        chaoticPendulum.removePendulum(pendulum)
+        divPendulum.remove()
+        draw()
+    })
+
+    const btnMinimize = document.createElement('button')
+    btnMinimize.type = 'button'
+    btnMinimize.className = 'btn-minimize-pendulum'
+    btnMinimize.addEventListener('click', function() {
+        divPendulum.classList.toggle('minimized')
+    })
+
+    colorsWrapper.append(labelBallColor, labelLineColor)
+
+    divPendulumAttributes.append(labelSpeed, labelLength, labelDegrees, colorsWrapper)
+
+    divPendulumAttributesWrapper.append(divPendulumAttributes)
+
+    divPendulum.append(divPendulumAttributesWrapper, btnRemovePendulum, btnMinimize)
+
+    return divPendulum
 }
 
 function createPendulum() {
@@ -423,17 +510,16 @@ function createPendulum() {
     divPendulumParts.appendChild(HTMLPendulum)
 }
 
-function paintBackground() {
-    ctx.save()
-    ctx.fillStyle = 'black'
-    ctx.fillRect(0, 0, canvas.width, canvas.height)
-    ctx.restore()
+function clearCanvas() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
 }
 
 function draw() {
-    paintBackground()
-
+    clearCanvas()
+    
+    ctx.setTransform(scale, 0, 0, scale, canvas.width / 2 + offsetX, canvas.height / 2 + offsetY)
     chaoticPendulum.draw()
+    resetContext()
 }
 
 function update() {
@@ -443,6 +529,9 @@ function update() {
 
 function startAnimation() {
     animationFrame = requestAnimationFrame(updateAnimation)
+
+    btnPlay.classList.add('hidden')
+    btnPause.classList.remove('hidden')
 }
 
 function updateAnimation() {
@@ -454,6 +543,9 @@ function updateAnimation() {
 
 function stopAnimation() {
     cancelAnimationFrame(animationFrame)
+
+    btnPause.classList.add('hidden')
+    btnPlay.classList.remove('hidden')
 }
 
 function toRadians(degrees) {
@@ -464,7 +556,57 @@ function toDegrees(radians) {
     return radians * 180 / Math.PI
 }
 
+function resizeCanvas() {
+    canvas.width = innerWidth
+    canvas.height = innerHeight
+}
+
+function setUpCanvas() {
+    resizeCanvas()
+    createPendulum()
+    draw()
+}
+
+function resetContext() {
+    ctx.setTransform(1, 0, 0, 1, 0, 0)
+}
+
+function translateCanvas(x, y) {
+    offsetX += x
+    offsetY += y
+}
+
+function zoomCanvas(zoom) {
+    scale *= zoom
+}
+
+function handleStartMove(x, y) {
+    prevX = x
+    prevY = y
+    isHolding = true
+}
+
+function handleMove(x, y) {
+    const offsetX = x - prevX
+    const offsetY = y - prevY
+    
+    prevX = x
+    prevY = y
+    
+    translateCanvas(offsetX, offsetY)
+    draw()
+}
+
+function handleStopMove() {
+    prevX = 0
+    prevY = 0
+    isHolding = false
+}
+
 const FULL_RADIANS = 2 * Math.PI
+
+const ZOOM_IN = 1.2
+const ZOOM_OUT = 1 / ZOOM_IN
 
 // pendulum constants
 const DEFAULT_PENDULUM_SPEED = 1
@@ -475,34 +617,81 @@ const DEFAULT_PENDULUM_RADIANS = Math.PI / 2
 const canvas = document.getElementById('chaotic-pendulum-canvas')
 const ctx = canvas.getContext('2d')
 
-const CENTER_X = canvas.width / 2
-const CENTER_Y = canvas.height / 2
+const divPendulumInfo = document.querySelector('.pendulum-info')
+const divPendulumParts = document.querySelector('.pendulum-parts')
 
-const chaoticPendulum = new ChaoticPendulum(ctx, CENTER_X, CENTER_Y)
+const chaoticPendulum = new ChaoticPendulum(ctx, 0, 0)
 const updateInputs = []
+
+let offsetX = 0
+let offsetY = 0
+let scale = 1
+
+let prevX = 0
+let prevY = 0
+let isHolding = false
 
 let animationFrame = null
 
-const divPendulumParts = document.querySelector('.pendulum-parts')
+const btnClose = document.querySelector('.btn-close')
+btnClose.addEventListener('click', function() {
+    divPendulumInfo.classList.toggle('closed')
+})
 
-const btnAddPart = document.getElementById('btnAddPart')
+const btnAddPart = document.querySelector('.btn-add')
 btnAddPart.addEventListener('click', function() {
     createPendulum()
     draw()
 })
 
-const inputMaxTrail = document.getElementById('inputMaxTrail')
-inputMaxTrail.value = chaoticPendulum.maxTrail
-inputMaxTrail.addEventListener('input', function() {
-    chaoticPendulum.maxTrail = parseInt(inputMaxTrail.value) || 0
+const btnPlay = document.querySelector('.btn-play')
+btnPlay.addEventListener('click', startAnimation)
+
+const btnPause = document.querySelector('.btn-pause')
+btnPause.addEventListener('click', stopAnimation)
+
+const btnZoomIn = document.querySelector('.btn-zoom-in')
+btnZoomIn.addEventListener('click', function() {
+    zoomCanvas(ZOOM_IN)
     draw()
 })
 
-const btnPlay = document.getElementById('btnPlay')
-btnPlay.addEventListener('click', startAnimation)
+const btnZoomOut = document.querySelector('.btn-zoom-out')
+btnZoomOut.addEventListener('click', function() {
+    zoomCanvas(ZOOM_OUT)
+    draw()
+})
 
-const btnStop = document.getElementById('btnStop')
-btnStop.addEventListener('click', stopAnimation)
+addEventListener('resize', resizeCanvas)
 
-createPendulum()
-draw()
+document.addEventListener('touchstart', function(event) {
+    const touch = event.touches[0]
+    handleStartMove(touch.clientX, touch.clientY)
+})
+
+document.addEventListener('touchmove', function(event) {
+    const touch = event.touches[0]
+    handleMove(touch.clientX, touch.clientY)
+})
+
+document.addEventListener('touchend', handleStopMove)
+
+
+document.addEventListener('mousedown',  function(event) {
+    handleStartMove(event.x, event.y)
+})
+document.addEventListener('mousemove',  function(event) {
+    if (!isHolding) return
+
+    handleMove(event.x, event.y)
+})
+document.addEventListener('mouseup', handleStopMove)
+
+document.addEventListener('wheel', function(e) {
+    const zoom = e.deltaY < 0 ? ZOOM_IN : ZOOM_OUT
+
+    zoomCanvas(zoom)
+    draw()
+})
+
+setUpCanvas()

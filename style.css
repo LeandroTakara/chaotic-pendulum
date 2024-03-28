@@ -3,116 +3,502 @@
     border: 0;
     margin: 0;
     box-sizing: border-box;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+:root {
+    /* controller */
+    --color-controller-play-pause: rgb(14, 232, 14);
+    
+    /* pendulum info */
+    --color-btn-close-wrapper: rgb(0, 0, 0);
+    --bg-color-pendulum-parts: rgb(224, 224, 224);
+    --time-close-pendulum-info: .6s;
+
+    /* pendulum */
+    --color-btn-remove-pendulum: rgb(220, 38, 38);
+    --color-btn-minimize-pendulum: rgb(25, 102, 217);
+    --time-minimize-pendulum: .6s;
+}
+
+html {
+    font-size: 16px;
 }
 
 body {
-    background-color: rgb(32, 32, 32);
+    overflow: hidden;
+    background-color: black;
+}
+
+main {
     overflow: hidden;
 }
 
 button {
     cursor: pointer;
+    background-color: transparent;
 }
 
-input[type="color"] {
-    cursor: pointer;
-}
-
-main {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
+/* pendulum info */
 
 .pendulum-info {
-    width: 800px;
-    height: 200px;
-    padding: 20px;
-    margin: 20px;
+    position: absolute;
+    top: calc(100% - 300px);
+    width: 100%;
+    height: 300px;
+    transition: var(--time-close-pendulum-info);
+}
+.pendulum-info.closed {
+    top: 100%;
+}
+
+/* close info button */
+
+.btn-close-wrapper {
+    position: absolute;
+    top: 0;
+    height: 5px;
+    width: 100%;
+    background-color: var(--color-btn-close-wrapper);
+    box-shadow: 0 0 20px 5px rgba(255, 255, 255, 0.2);
+    transition: var(--time-close-pendulum-info);
+}
+.pendulum-info.closed .btn-close-wrapper {
+    top: -10%;
+    box-shadow: none
+}
+
+.btn-close {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    translate: -50% -50%;
+    width: 30px;
+    height: 30px;
+    border-radius: 100%;
     background-color: white;
+    border: solid var(--color-btn-close-wrapper) 4px;
+    box-shadow: 0 0 20px 5px rgba(255, 255, 255, 0.2);
+    transition: var(--time-close-pendulum-info);
+}
+.btn-close::before, .btn-close::after {
+    content: "";
+    position: absolute;
+    top: 53%;
+    translate: -50% -50%;
+    width: 50%;
+    height: 12%;
+    border-radius: 10px;
+    background-color: var(--color-btn-close-wrapper);
+}
+.btn-close::before {
+    left: 35%;
+    rotate: z 45deg;
+}
+.btn-close::after {
+    left: 65%;
+    rotate: z -45deg;
 }
 
-.inputs {
-    height: 30%;
-    border-bottom: solid 3px black;
-    padding-bottom: 4px;
+.pendulum-info.closed .btn-close {
+    width: 40px;
+    height: 40px;
+}
+.pendulum-info.closed .btn-close::before {
+    top: 47%;
+    rotate: z -45deg;
+}
+.pendulum-info.closed .btn-close::after {
+    top: 47%;
+    rotate: z 45deg;
 }
 
-.button {
-    padding: 10px 20px;
-    background-color: rgb(213, 213, 213);
-    transition: background-color .3s;
-}
+/* pendulum info content */
 
-.button:hover {
-    background-color: rgb(183, 183, 183);
+.pendulum-parts-container {
+    height: 100%;
 }
 
 .pendulum-parts {
+    padding: 0 20px;
     height: 70%;
-    overflow-y: auto;
+    overflow-y: scroll;
+    border-bottom: solid black 2px;
+    background-color: var(--bg-color-pendulum-parts);
 }
 
 .pendulum {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 30px;
-    padding: 4px 10px;
-    margin-top: 10px;
-    border: solid black 3px;
-    border-radius: 30px;
-    background-color: rgb(240, 240, 240);
-}
-
-.input-pendulum-color-wrapper {
     position: relative;
-    width: 20px;
-    height: 20px;
-    overflow: hidden;
+    margin: 20px 0;
     border: solid black 2px;
-    border-radius: 100%;
+    border-radius: 12px;
+    background-color: white;
 }
 
-.input-pendulum-color {
+.pendulum-attributes-wrapper {
+    padding: 10px;
+}
+
+.pendulum-attributes {
+    position: relative;
+    height: 100px;
+    transition: var(--time-minimize-pendulum);
+}
+.pendulum.minimized .pendulum-attributes {
+    height: 30px;
+}
+
+/* pendulum number input */
+.pendulum-number-attribute {
+    position: absolute;
+    text-transform: uppercase;
+    text-align: center;
+    width: 50%;
+    height: 50%;
+    transition: var(--time-minimize-pendulum);
+}
+.pendulum.minimized .pendulum-number-attribute {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.attribute-speed {
+    top: 0;
+    left: 0;
+}
+.attribute-length {
+    top: 0;
+    right: 0;
+}
+.attribute-degrees {
+    bottom: 0;
+    left: 0;
+}
+
+.pendulum-input-number {
+    display: block;
+    width: 80%;
+    padding: 6px;
+    margin: 0 auto;
+    border-radius: 10px;
+    border: solid black 2px;
+    height: 50%;
+}
+
+/* pendulum color input */
+.colors-wrapper {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 50%;
+    height: 50%;
+    transition: var(--time-minimize-pendulum);
+}
+.pendulum.minimized .colors-wrapper {
+    width: 80%;
+    height: 100%;
+    top: 50%;
+    left: 50%;
+    translate: -50% -50%;
+}
+
+.pendulum-color-attribute {
+    position: absolute;
+    width: 25px;
+    height: 100%;
+    transition: var(--time-minimize-pendulum);
+}
+
+.attribute-ball-color {
+    left: 30%;
+    translate: -50%;
+}
+.pendulum.minimized .attribute-ball-color {
+    left: 0;
+}
+
+.attribute-line-color {
+    left: 70%;
+    translate: -50%;
+}
+.pendulum.minimized .attribute-line-color {
+    left: 60%;
+}
+
+.icon-wrapper {
+    position: absolute;
+    top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 25px;
+    height: 25px;
+}
+.pendulum.minimized .icon-wrapper {
+    top: 50%;
+    translate: 0 -50%;
+}
+
+.ball-icon {
+    width: 15px; 
+    height: 15px;
+    border-radius: 100%;
+    background-color: black;
+}
+.line-icon{
+    width: 22px;
+    height: 4px; 
+    border-radius: 10px;
+    rotate: z -45deg;
+    background-color: black;
+}
+
+.pendulum-input-color-wrapper {
+    position: absolute;
+    bottom: 0;
+    width: 25px;
+    height: 25px;
+    border: dashed black 2px;
+    border-radius: 100%;
+    overflow: hidden;
+    transition: var(--time-minimize-pendulum);
+}
+.pendulum.minimized .pendulum-input-color-wrapper {
+    left: 150%;
+    width: 80px;
+    border-radius: 0;
+}
+
+.pendulum-input-color {
     position: absolute;
     top: 50%;
     left: 50%;
     width: 200%;
     height: 200%;
     translate: -50% -50%;
+    cursor: pointer;
 }
 
-.input-pendulum-attribute {
-    width: 80px;
-    padding: 4px;
-}
+/* pendulum buttons */
 
-.btnRemovePendulum {
-    position: relative;
-    width: 10px;
-    height: 10px;
+.btn-close-pendulum {
+    position: absolute;
+    top: 0;
+    right: 0;
+    translate: -50% -50%;
+    width: 20px;
+    height: 20px;
+    border: solid var(--color-btn-remove-pendulum) 2px;
+    border-radius: 100%;
+    background-color: white;
 }
-
-.btnRemovePendulum::before, .btnRemovePendulum::after {
+.btn-close-pendulum::before, .btn-close-pendulum::after {
     content: "";
     position: absolute;
     top: 50%;
     left: 50%;
     translate: -50% -50%;
-    width: 15px;
-    height: 5px;
-    background-color: red;
+    width: 60%;
+    height: 12%;
+    margin: 0 auto;
+    border-radius: 10px;
+    background-color: var(--color-btn-remove-pendulum);
+}
+.btn-close-pendulum::before {
+    rotate: z 45deg;
+}
+.btn-close-pendulum::after {
+    rotate: z -45deg;
 }
 
-.btnRemovePendulum::before {
-    rotate: -45deg;
+.btn-minimize-pendulum {
+    position: absolute;
+    top: 0;
+    left: 0;
+    translate: 50% -50%;
+    width: 20px;
+    height: 20px;
+    border: solid var(--color-btn-minimize-pendulum) 2px;
+    border-radius: 100%;
+    background-color: white;
+}
+.btn-minimize-pendulum::before, .btn-minimize-pendulum::after {
+    content: "";
+    position: absolute;
+    top: 47%;
+    translate: -50% -50%;
+    width: 50%;
+    height: 12%;
+    margin: 0 auto;
+    background-color: var(--color-btn-minimize-pendulum);
+    border-radius: 10px;
+    transition: var(--time-minimize-pendulum);
+}
+.btn-minimize-pendulum::before {
+    rotate: z 45deg;
+    left: 65%;
+}
+.btn-minimize-pendulum::after {
+    rotate: z -45deg;
+    left: 35%;
+}
+.pendulum.minimized .btn-minimize-pendulum::before {
+    top: 53%;
+    rotate: z -45deg;
+}
+.pendulum.minimized .btn-minimize-pendulum::after {
+    top: 53%;
+    rotate: z 45deg;
 }
 
-.btnRemovePendulum::after {
-    rotate: 45deg;
+.btn-add-wrapper {
+    height: 30%;
+    background-color: white;
+}
+.btn-add {
+    display: flex;
+    align-items: center;
+    column-gap: 10px;
+    height: 100%;
+    margin: 0 auto;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    color: black;
+}
+.btn-add-icon {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    border: solid black 4px;
+    border-radius: 100%;
+}
+.btn-add-icon::before, .btn-add-icon::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    translate: -50% -50%;
+    width: 60%;
+    height: 12%;
+    border-radius: 10px;
+    background-color: black;
+}
+.btn-add-icon::after {
+    rotate: z 90deg;
+}
+.btn-add-text {
+    font-weight: 900;
 }
 
-.canvas-container {
-    margin: 20px;
+/* canvas controller */
+
+.btn-play, .btn-pause {
+    display: block;
+    position: absolute;
+    top: 5%;
+    left: 50%;
+    translate: -50% -50%;
+    width: 30px;
+    height: 30px;
+    margin: 0 auto;
+    border-radius: 100%;
+    border: solid white 3px;
+    background-color: black;
+}
+.btn-play.hidden, .btn-pause.hidden {
+    display: none;
+}
+
+.btn-play::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 55%;
+    translate: -50% -50%;
+    border-left: solid var(--color-controller-play-pause) 10px;
+    border-top: solid transparent 7px;
+    border-bottom: solid transparent 7px;
+}
+
+.btn-pause::before, .btn-pause::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    translate: -50% -50%;
+    height: 50%;
+    width: 12%;
+    background-color: var(--color-controller-play-pause);
+}
+.btn-pause::before {
+    left: 38%;
+}
+.btn-pause::after {
+    left: 62%;
+}
+
+.zoom-container {
+    position: absolute;
+    right: 3%;
+    top: 5%;
+    border: solid white 2px;
+    border-radius: 10px;
+}
+
+.btn-zoom-in, .btn-zoom-out {
+    display: block;
+}
+
+.btn-zoom-in .icon-plus {
+    --color: white;
+    --size: 40px;
+    border-bottom: solid white 2px;
+}
+
+.btn-zoom-out .icon-minus {
+    --color: white;
+    --size: 40px;
+}
+
+.icon-plus {
+    --color: black;
+    --size: 0;
+
+    position: relative;
+    width: var(--size);
+    height: var(--size);
+}
+.icon-plus::before, .icon-plus::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    translate: -50% -50%;
+    width: 60%;
+    height: 12%;
+    border-radius: 10px;
+    background-color: var(--color);
+}
+.icon-plus::after {
+    rotate: z 90deg;
+}
+
+
+.icon-minus {
+    --color: black;
+    --size: 0;
+
+    position: relative;
+    width: var(--size);
+    height: var(--size);
+}
+.icon-minus::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    translate: -50% -50%;
+    width: 60%;
+    height: 12%;
+    border-radius: 10px;
+    background-color: var(--color);
 }

@@ -10,25 +10,38 @@
 <body>
     <main>
         <div class="pendulum-info">
-            <div class="inputs">
-                <button type="button" class="button" id="btnAddPart">Add part</button>
-                <label>
-                    Max dots:
-                    <input type="number" id="inputMaxTrail" min="0">
-                </label>
+            <div class="btn-close-wrapper">
+                <button type="button" class="btn-close"></button>
             </div>
 
-            <div class="pendulum-parts"></div>
+            <div class="pendulum-parts-container">
+                <div class="pendulum-parts"></div>
+
+                <div class="btn-add-wrapper">
+                    <button type="button" class="btn-add">
+                        <div class="btn-add-icon"></div>
+                        <span class="btn-add-text">Add Pendulum</span>
+                    </button>
+                </div>
+            </div>
         </div>
 
-        <div class="pendulum-control">
-            <button type="button" id="btnPlay">Play</button>
-            <button type="button" id="btnStop">Stop</button>
+        <div class="pendulum-controller">
+            <button type="button" class="btn-play"></button>
+            <button type="button" class="btn-pause hidden"></button>
+
+            <div class="zoom-container">
+                <button type="button" class="btn-zoom-in">
+                    <div class="icon-plus"></div>
+                </button>
+
+                <button type="button" class="btn-zoom-out">
+                    <div class="icon-minus"></div>
+                </button>
+            </div>
         </div>
 
-        <div class="canvas-container">
-            <canvas height="400" width="800" id="chaotic-pendulum-canvas"></canvas>
-        </div>
+        <canvas id="chaotic-pendulum-canvas"></canvas>
     </main>
 </body>
 </html>
