@@ -27,6 +27,7 @@ html {
 
 body {
     overflow: hidden;
+    background-color: black;
 }
 
 main {
@@ -391,15 +392,12 @@ button {
 
 /* canvas controller */
 
-.pendulum-controller {
-    position: absolute;
-    top: 3%;
-    width: 100vw;
-}
-
 .btn-play, .btn-pause {
     display: block;
-    position: relative;
+    position: absolute;
+    top: 5%;
+    left: 50%;
+    translate: -50% -50%;
     width: 30px;
     height: 30px;
     margin: 0 auto;
@@ -436,4 +434,71 @@ button {
 }
 .btn-pause::after {
     left: 62%;
+}
+
+.zoom-container {
+    position: absolute;
+    right: 3%;
+    top: 5%;
+    border: solid white 2px;
+    border-radius: 10px;
+}
+
+.btn-zoom-in, .btn-zoom-out {
+    display: block;
+}
+
+.btn-zoom-in .icon-plus {
+    --color: white;
+    --size: 40px;
+    border-bottom: solid white 2px;
+}
+
+.btn-zoom-out .icon-minus {
+    --color: white;
+    --size: 40px;
+}
+
+.icon-plus {
+    --color: black;
+    --size: 0;
+
+    position: relative;
+    width: var(--size);
+    height: var(--size);
+}
+.icon-plus::before, .icon-plus::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    translate: -50% -50%;
+    width: 60%;
+    height: 12%;
+    border-radius: 10px;
+    background-color: var(--color);
+}
+.icon-plus::after {
+    rotate: z 90deg;
+}
+
+
+.icon-minus {
+    --color: black;
+    --size: 0;
+
+    position: relative;
+    width: var(--size);
+    height: var(--size);
+}
+.icon-minus::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    translate: -50% -50%;
+    width: 60%;
+    height: 12%;
+    border-radius: 10px;
+    background-color: var(--color);
 }

@@ -162,6 +162,8 @@ class Pendulum {
  * It controls the Pendulum and Trail class
  */
 class ChaoticPendulum {
+    #x
+    #y
     #maxTrails
 
     // acts like a queue
@@ -182,14 +184,34 @@ class ChaoticPendulum {
      */
     constructor(ctx, x, y) {
         this.ctx = ctx
-        this.x = x
-        this.y = y
+        this.#x = x
+        this.#y = y
 
         this.#maxTrails = 10
         this.trails = []
 
         this.firstPendulum = null
         this.lastPendulum = null
+    }
+
+    get x() {
+        return this.#x
+    }
+
+    set x(value) {
+        this.#x = value
+
+        if (this.firstPendulum) this.firstPendulum.startX = value
+    }
+
+    get y() {
+        return this.#y
+    }
+
+    set y(value) {
+        this.#y = value
+
+        if (this.firstPendulum) this.firstPendulum.startY = value
     }
 
     get maxTrail() {
@@ -488,17 +510,16 @@ function createPendulum() {
     divPendulumParts.appendChild(HTMLPendulum)
 }
 
-function paintBackground() {
-    ctx.save()
-    ctx.fillStyle = 'black'
-    ctx.fillRect(0, 0, canvas.width, canvas.height)
-    ctx.restore()
+function clearCanvas() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
 }
 
 function draw() {
-    paintBackground()
-
+    clearCanvas()
+    
+    ctx.setTransform(scale, 0, 0, scale, canvas.width / 2 + offsetX, canvas.height / 2 + offsetY)
     chaoticPendulum.draw()
+    resetContext()
 }
 
 function update() {
@@ -540,7 +561,52 @@ function resizeCanvas() {
     canvas.height = innerHeight
 }
 
+function setUpCanvas() {
+    resizeCanvas()
+    createPendulum()
+    draw()
+}
+
+function resetContext() {
+    ctx.setTransform(1, 0, 0, 1, 0, 0)
+}
+
+function translateCanvas(x, y) {
+    offsetX += x
+    offsetY += y
+}
+
+function zoomCanvas(zoom) {
+    scale *= zoom
+}
+
+function handleStartMove(x, y) {
+    prevX = x
+    prevY = y
+    isHolding = true
+}
+
+function handleMove(x, y) {
+    const offsetX = x - prevX
+    const offsetY = y - prevY
+    
+    prevX = x
+    prevY = y
+    
+    translateCanvas(offsetX, offsetY)
+    draw()
+}
+
+function handleStopMove() {
+    prevX = 0
+    prevY = 0
+    isHolding = false
+}
+
 const FULL_RADIANS = 2 * Math.PI
+
+const ZOOM_IN = 1.2
+const ZOOM_OUT = 1 / ZOOM_IN
 
 // pendulum constants
 const DEFAULT_PENDULUM_SPEED = 1
@@ -551,16 +617,21 @@ const DEFAULT_PENDULUM_RADIANS = Math.PI / 2
 const canvas = document.getElementById('chaotic-pendulum-canvas')
 const ctx = canvas.getContext('2d')
 
-const CENTER_X = canvas.width / 2
-const CENTER_Y = canvas.height / 2
-
-const chaoticPendulum = new ChaoticPendulum(ctx, CENTER_X, CENTER_Y)
-const updateInputs = []
-
-let animationFrame = null
-
 const divPendulumInfo = document.querySelector('.pendulum-info')
 const divPendulumParts = document.querySelector('.pendulum-parts')
+
+const chaoticPendulum = new ChaoticPendulum(ctx, 0, 0)
+const updateInputs = []
+
+let offsetX = 0
+let offsetY = 0
+let scale = 1
+
+let prevX = 0
+let prevY = 0
+let isHolding = false
+
+let animationFrame = null
 
 const btnClose = document.querySelector('.btn-close')
 btnClose.addEventListener('click', function() {
@@ -579,8 +650,48 @@ btnPlay.addEventListener('click', startAnimation)
 const btnPause = document.querySelector('.btn-pause')
 btnPause.addEventListener('click', stopAnimation)
 
+const btnZoomIn = document.querySelector('.btn-zoom-in')
+btnZoomIn.addEventListener('click', function() {
+    zoomCanvas(ZOOM_IN)
+    draw()
+})
+
+const btnZoomOut = document.querySelector('.btn-zoom-out')
+btnZoomOut.addEventListener('click', function() {
+    zoomCanvas(ZOOM_OUT)
+    draw()
+})
+
 addEventListener('resize', resizeCanvas)
 
-resizeCanvas()
-createPendulum()
-draw()
+document.addEventListener('touchstart', function(event) {
+    const touch = event.touches[0]
+    handleStartMove(touch.clientX, touch.clientY)
+})
+
+document.addEventListener('touchmove', function(event) {
+    const touch = event.touches[0]
+    handleMove(touch.clientX, touch.clientY)
+})
+
+document.addEventListener('touchend', handleStopMove)
+
+
+document.addEventListener('mousedown',  function(event) {
+    handleStartMove(event.x, event.y)
+})
+document.addEventListener('mousemove',  function(event) {
+    if (!isHolding) return
+
+    handleMove(event.x, event.y)
+})
+document.addEventListener('mouseup', handleStopMove)
+
+document.addEventListener('wheel', function(e) {
+    const zoom = e.deltaY < 0 ? ZOOM_IN : ZOOM_OUT
+
+    zoomCanvas(zoom)
+    draw()
+})
+
+setUpCanvas()
