@@ -11,7 +11,6 @@
     --color-controller-play-pause: rgb(14, 232, 14);
     
     /* pendulum info */
-    --color-btn-close-wrapper: rgb(0, 0, 0);
     --bg-color-pendulum-parts: rgb(224, 224, 224);
     --time-close-pendulum-info: .6s;
 
@@ -21,94 +20,187 @@
     --time-minimize-pendulum: .6s;
 }
 
-html {
-    font-size: 16px;
-}
-
-body {
-    overflow: hidden;
-    background-color: black;
-}
-
-main {
-    overflow: hidden;
-}
+/* general */
 
 button {
     cursor: pointer;
     background-color: transparent;
 }
 
-/* pendulum info */
+/* icons */
 
-.pendulum-info {
-    position: absolute;
-    top: calc(100% - 300px);
-    width: 100%;
-    height: 300px;
-    transition: var(--time-close-pendulum-info);
-}
-.pendulum-info.closed {
-    top: 100%;
-}
+.icon-plus {
+    --color: black;
+    --size: 0;
 
-/* close info button */
-
-.btn-close-wrapper {
-    position: absolute;
-    top: 0;
-    height: 5px;
-    width: 100%;
-    background-color: var(--color-btn-close-wrapper);
-    box-shadow: 0 0 20px 5px rgba(255, 255, 255, 0.2);
-    transition: var(--time-close-pendulum-info);
+    position: relative;
+    width: var(--size);
+    height: var(--size);
 }
-.pendulum-info.closed .btn-close-wrapper {
-    top: -10%;
-    box-shadow: none
-}
-
-.btn-close {
+.icon-plus::before, .icon-plus::after {
+    content: "";
     position: absolute;
     top: 50%;
     left: 50%;
     translate: -50% -50%;
-    width: 30px;
-    height: 30px;
-    border-radius: 100%;
-    background-color: white;
-    border: solid var(--color-btn-close-wrapper) 4px;
-    box-shadow: 0 0 20px 5px rgba(255, 255, 255, 0.2);
-    transition: var(--time-close-pendulum-info);
+    width: 60%;
+    height: 12%;
+    border-radius: 10px;
+    background-color: var(--color);
 }
-.btn-close::before, .btn-close::after {
+.icon-plus::after {
+    rotate: z 90deg;
+}
+
+.icon-minus {
+    --color: black;
+    --size: 0;
+
+    position: relative;
+    width: var(--size);
+    height: var(--size);
+}
+.icon-minus::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    translate: -50% -50%;
+    width: 60%;
+    height: 12%;
+    border-radius: 10px;
+    background-color: var(--color);
+}
+
+.icon-chevron {
+    --color: black;
+    --size: 0;
+
+    position: relative;
+    width: var(--size);
+    height: var(--size);
+}
+.icon-chevron::before, .icon-chevron::after {
     content: "";
     position: absolute;
     top: 53%;
     translate: -50% -50%;
     width: 50%;
     height: 12%;
+    background-color: var(--color);
     border-radius: 10px;
-    background-color: var(--color-btn-close-wrapper);
 }
-.btn-close::before {
+.icon-chevron::before {
     left: 35%;
     rotate: z 45deg;
 }
-.btn-close::after {
+.icon-chevron::after {
     left: 65%;
     rotate: z -45deg;
 }
 
-.pendulum-info.closed .btn-close {
-    width: 40px;
-    height: 40px;
+.icon-x {
+    --color: black;
+    --size: 0;
+
+    position: relative;
+    width: var(--size);
+    height: var(--size);
 }
-.pendulum-info.closed .btn-close::before {
+.icon-x::before, .icon-x::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    translate: -50% -50%;
+    width: 60%;
+    height: 12%;
+    border-radius: 10px;
+    background-color: var(--color);
+}
+.icon-x::before {
+    rotate: z 45deg;
+}
+.icon-x::after {
+    rotate: z -45deg;
+}
+
+/* styling */
+
+html {
+    font-size: 16px;
+}
+
+body {
+    height: 100vh;
+    overflow: hidden;
+    background-color: black;
+}
+
+main {
+    height: 100%;
+}
+
+.chaotic-pendulum-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+#chaotic-pendulum-canvas {
+    display: block;
+    width: 100%;
+    flex-grow: 1;
+    overflow: hidden;
+}
+
+/* pendulum info */
+
+.pendulum-info {
+    position: relative;
+    width: 100%;
+    height: 300px;
+    box-shadow: 0 0 20px 5px rgba(255, 255, 255, 0.2);
+    transition: var(--time-close-pendulum-info);
+}
+
+/* pendulum info close button */
+
+.btn-close {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    translate: -50% -50%;
+    border-radius: 100%;
+    border: solid black 4px;
+    background-color: white;
+    box-shadow: 0 0 20px 5px rgba(255, 255, 255, 0.2);
+    z-index: 1;
+    transition: var(--time-close-pendulum-info);
+}
+.btn-close .icon-chevron {
+    --size: 30px;
+}
+.btn-close .icon-chevron::before, .btn-close .icon-chevron::after {
+    transition: var(--time-close-pendulum-info);
+}
+
+/* pendulum info (closed) */
+
+.pendulum-info.closed {
+    height: 0;
+    box-shadow: none;
+}
+.pendulum-info.closed .btn-close {
+    --size: 40px;
+
+    top: -30px;
+}
+.pendulum-info.closed .btn-close .icon-chevron::before {
     top: 47%;
     rotate: z -45deg;
 }
-.pendulum-info.closed .btn-close::after {
+.pendulum-info.closed .btn-close .icon-chevron::after {
     top: 47%;
     rotate: z 45deg;
 }
@@ -116,17 +208,18 @@ button {
 /* pendulum info content */
 
 .pendulum-parts-container {
-    height: 100%;
+    height: 300px;
 }
 
 .pendulum-parts {
-    padding: 0 20px;
     height: 70%;
-    overflow-y: scroll;
+    padding: 10px 20px 0;
     border-bottom: solid black 2px;
     background-color: var(--bg-color-pendulum-parts);
+    overflow-y: scroll;
 }
 
+/* pendulum */
 .pendulum {
     position: relative;
     margin: 20px 0;
@@ -144,49 +237,38 @@ button {
     height: 100px;
     transition: var(--time-minimize-pendulum);
 }
-.pendulum.minimized .pendulum-attributes {
-    height: 30px;
+
+.pendulum-number-inputs {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+    height: 100%;
 }
 
 /* pendulum number input */
 .pendulum-number-attribute {
-    position: absolute;
-    text-transform: uppercase;
-    text-align: center;
     width: 50%;
     height: 50%;
+    text-transform: uppercase;
+    text-align: center;
     transition: var(--time-minimize-pendulum);
-}
-.pendulum.minimized .pendulum-number-attribute {
-    opacity: 0;
-    pointer-events: none;
-}
-
-.attribute-speed {
-    top: 0;
-    left: 0;
-}
-.attribute-length {
-    top: 0;
-    right: 0;
-}
-.attribute-degrees {
-    bottom: 0;
-    left: 0;
 }
 
 .pendulum-input-number {
     display: block;
     width: 80%;
+    height: 50%;
     padding: 6px;
     margin: 0 auto;
     border-radius: 10px;
     border: solid black 2px;
-    height: 50%;
 }
 
 /* pendulum color input */
 .colors-wrapper {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
     position: absolute;
     bottom: 0;
     right: 0;
@@ -194,35 +276,12 @@ button {
     height: 50%;
     transition: var(--time-minimize-pendulum);
 }
-.pendulum.minimized .colors-wrapper {
-    width: 80%;
-    height: 100%;
-    top: 50%;
-    left: 50%;
-    translate: -50% -50%;
-}
 
 .pendulum-color-attribute {
-    position: absolute;
+    position: relative;
     width: 25px;
     height: 100%;
     transition: var(--time-minimize-pendulum);
-}
-
-.attribute-ball-color {
-    left: 30%;
-    translate: -50%;
-}
-.pendulum.minimized .attribute-ball-color {
-    left: 0;
-}
-
-.attribute-line-color {
-    left: 70%;
-    translate: -50%;
-}
-.pendulum.minimized .attribute-line-color {
-    left: 60%;
 }
 
 .icon-wrapper {
@@ -234,11 +293,6 @@ button {
     width: 25px;
     height: 25px;
 }
-.pendulum.minimized .icon-wrapper {
-    top: 50%;
-    translate: 0 -50%;
-}
-
 .ball-icon {
     width: 15px; 
     height: 15px;
@@ -263,19 +317,14 @@ button {
     overflow: hidden;
     transition: var(--time-minimize-pendulum);
 }
-.pendulum.minimized .pendulum-input-color-wrapper {
-    left: 150%;
-    width: 80px;
-    border-radius: 0;
-}
 
 .pendulum-input-color {
     position: absolute;
     top: 50%;
     left: 50%;
+    translate: -50% -50%;
     width: 200%;
     height: 200%;
-    translate: -50% -50%;
     cursor: pointer;
 }
 
@@ -286,29 +335,14 @@ button {
     top: 0;
     right: 0;
     translate: -50% -50%;
-    width: 20px;
-    height: 20px;
     border: solid var(--color-btn-remove-pendulum) 2px;
     border-radius: 100%;
     background-color: white;
 }
-.btn-close-pendulum::before, .btn-close-pendulum::after {
-    content: "";
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    translate: -50% -50%;
-    width: 60%;
-    height: 12%;
-    margin: 0 auto;
-    border-radius: 10px;
-    background-color: var(--color-btn-remove-pendulum);
-}
-.btn-close-pendulum::before {
-    rotate: z 45deg;
-}
-.btn-close-pendulum::after {
-    rotate: z -45deg;
+
+.btn-close-pendulum .icon-x {
+    --size: 20px;
+    --color: var(--color-btn-remove-pendulum);
 }
 
 .btn-minimize-pendulum {
@@ -316,40 +350,64 @@ button {
     top: 0;
     left: 0;
     translate: 50% -50%;
-    width: 20px;
-    height: 20px;
     border: solid var(--color-btn-minimize-pendulum) 2px;
     border-radius: 100%;
     background-color: white;
 }
-.btn-minimize-pendulum::before, .btn-minimize-pendulum::after {
-    content: "";
-    position: absolute;
-    top: 47%;
-    translate: -50% -50%;
-    width: 50%;
-    height: 12%;
-    margin: 0 auto;
-    background-color: var(--color-btn-minimize-pendulum);
-    border-radius: 10px;
+.btn-minimize-pendulum .icon-chevron {
+    --size: 20px;
+    --color: var(--color-btn-minimize-pendulum);
+}
+.btn-minimize-pendulum .icon-chevron::before, .btn-minimize-pendulum .icon-chevron::after {
     transition: var(--time-minimize-pendulum);
 }
-.btn-minimize-pendulum::before {
-    rotate: z 45deg;
-    left: 65%;
+
+/* pendulum (minimized) */
+
+.pendulum.minimized .pendulum-attributes {
+    height: 30px;
 }
-.btn-minimize-pendulum::after {
+
+.pendulum.minimized .pendulum-number-attribute {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.pendulum.minimized .colors-wrapper {
+    bottom: 50%;
+    right: 50%;
+    translate: 50% 50%;
+    width: 80%;
+    height: 100%;
+}
+
+.pendulum.minimized .pendulum-color-attribute {
+    width: 50%;
+}
+
+.pendulum.minimized .icon-wrapper {
+    top: 50%;
+    translate: 0 -50%;
+}
+
+.pendulum.minimized .pendulum-input-color-wrapper {
+    bottom: 50%;
+    left: 25px;
+    translate: 0 50%;
+    width: 80px;
+    border-radius: 0;
+}
+
+.pendulum.minimized .icon-chevron::before {
+    top: 47%;
     rotate: z -45deg;
-    left: 35%;
 }
-.pendulum.minimized .btn-minimize-pendulum::before {
-    top: 53%;
-    rotate: z -45deg;
-}
-.pendulum.minimized .btn-minimize-pendulum::after {
-    top: 53%;
+.pendulum.minimized .icon-chevron::after {
+    top: 47%;
     rotate: z 45deg;
 }
+
+/* add button */
 
 .btn-add-wrapper {
     height: 30%;
@@ -365,28 +423,15 @@ button {
     letter-spacing: 4px;
     color: black;
 }
-.btn-add-icon {
-    position: relative;
-    width: 40px;
-    height: 40px;
+.btn-add .icon-add-wrapper {
     border: solid black 4px;
     border-radius: 100%;
 }
-.btn-add-icon::before, .btn-add-icon::after {
-    content: "";
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    translate: -50% -50%;
-    width: 60%;
-    height: 12%;
-    border-radius: 10px;
-    background-color: black;
-}
-.btn-add-icon::after {
-    rotate: z 90deg;
+.btn-add .icon-plus {
+    --size: 40px;
 }
 .btn-add-text {
+    font-size: 1rem;
     font-weight: 900;
 }
 
@@ -443,62 +488,19 @@ button {
     border: solid white 2px;
     border-radius: 10px;
 }
-
 .btn-zoom-in, .btn-zoom-out {
     display: block;
 }
 
+.btn-zoom-in {
+    border-bottom: solid white 2px;
+}
 .btn-zoom-in .icon-plus {
     --color: white;
     --size: 40px;
-    border-bottom: solid white 2px;
 }
 
 .btn-zoom-out .icon-minus {
     --color: white;
     --size: 40px;
-}
-
-.icon-plus {
-    --color: black;
-    --size: 0;
-
-    position: relative;
-    width: var(--size);
-    height: var(--size);
-}
-.icon-plus::before, .icon-plus::after {
-    content: "";
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    translate: -50% -50%;
-    width: 60%;
-    height: 12%;
-    border-radius: 10px;
-    background-color: var(--color);
-}
-.icon-plus::after {
-    rotate: z 90deg;
-}
-
-
-.icon-minus {
-    --color: black;
-    --size: 0;
-
-    position: relative;
-    width: var(--size);
-    height: var(--size);
-}
-.icon-minus::before {
-    content: "";
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    translate: -50% -50%;
-    width: 60%;
-    height: 12%;
-    border-radius: 10px;
-    background-color: var(--color);
 }

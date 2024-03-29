@@ -9,19 +9,27 @@
 </head>
 <body>
     <main>
-        <div class="pendulum-info">
-            <div class="btn-close-wrapper">
-                <button type="button" class="btn-close"></button>
-            </div>
+        <div class="chaotic-pendulum-container">
+            <canvas id="chaotic-pendulum-canvas"></canvas>
 
-            <div class="pendulum-parts-container">
-                <div class="pendulum-parts"></div>
+            <div class="pendulum-info">
+                <button type="button" class="btn-close">
+                    <div class="icon-chevron"></div>
+                </button>
 
-                <div class="btn-add-wrapper">
-                    <button type="button" class="btn-add">
-                        <div class="btn-add-icon"></div>
-                        <span class="btn-add-text">Add Pendulum</span>
-                    </button>
+                <div class="pendulum-parts-container">
+                    <div class="pendulum-parts">
+                        <!-- the pendulums are created here -->
+                    </div>
+
+                    <div class="btn-add-wrapper">
+                        <button type="button" class="btn-add">
+                            <div class="icon-add-wrapper">
+                                <div class="icon-plus"></div>
+                            </div>
+                            <span class="btn-add-text">Add Pendulum</span>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -40,8 +48,6 @@
                 </button>
             </div>
         </div>
-
-        <canvas id="chaotic-pendulum-canvas"></canvas>
     </main>
 </body>
 </html>

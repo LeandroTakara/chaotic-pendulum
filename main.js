@@ -400,7 +400,7 @@ function createHTMLPendulumAttributeColor(iconName, initialValue, inputCallback)
     const iconWrapper = document.createElement('div')
     iconWrapper.className = 'icon-wrapper'
 
-    const icon = document.createElement('span')
+    const icon = document.createElement('div')
     icon.className = iconName
 
     iconWrapper.appendChild(icon)
@@ -435,13 +435,16 @@ function createHTMLPendulum(pendulum) {
 
     const divPendulumAttributes = document.createElement('div')
     divPendulumAttributes.className = 'pendulum-attributes'
+
+    const divPendulumNumberInputs = document.createElement('div')
+    divPendulumNumberInputs.className = 'pendulum-number-inputs'
+
     
     const labelSpeed = createHTMLPendulumAttributeNumber('Speed', pendulum.angularSpeed,
         function(value) {
             pendulum.angularSpeed = value
         }
     )
-    labelSpeed.classList.add('attribute-speed')
 
     const labelLength = createHTMLPendulumAttributeNumber('Length', pendulum.length,
         function(value) {
@@ -449,7 +452,6 @@ function createHTMLPendulum(pendulum) {
             draw()
         }
     )
-    labelLength.classList.add('attribute-length')
 
     const labelDegrees = createHTMLPendulumAttributeNumber('Degrees', toDegrees(pendulum.radians),
         function(value) {
@@ -458,7 +460,8 @@ function createHTMLPendulum(pendulum) {
         },
         () => toDegrees(pendulum.radians)
     )
-    labelDegrees.classList.add('attribute-degrees')
+
+    divPendulumNumberInputs.append(labelSpeed, labelLength, labelDegrees)
 
     const colorsWrapper = document.createElement('div')
     colorsWrapper.className = 'colors-wrapper'
@@ -467,13 +470,11 @@ function createHTMLPendulum(pendulum) {
         pendulum.ballColor = value
         draw()
     })
-    labelBallColor.classList.add('attribute-ball-color')
 
     const labelLineColor = createHTMLPendulumAttributeColor('line-icon', pendulum.lineColor, function(value) {
         pendulum.lineColor = value
         draw()
     })
-    labelLineColor.classList.add('attribute-line-color')
 
     const btnRemovePendulum = document.createElement('button')
     btnRemovePendulum.type = 'button'
@@ -484,6 +485,11 @@ function createHTMLPendulum(pendulum) {
         draw()
     })
 
+    const iconX = document.createElement('div')
+    iconX.className = 'icon-x'
+
+    btnRemovePendulum.appendChild(iconX)
+
     const btnMinimize = document.createElement('button')
     btnMinimize.type = 'button'
     btnMinimize.className = 'btn-minimize-pendulum'
@@ -491,9 +497,14 @@ function createHTMLPendulum(pendulum) {
         divPendulum.classList.toggle('minimized')
     })
 
+    const iconChevron = document.createElement('div')
+    iconChevron.className = 'icon-chevron'
+
+    btnMinimize.appendChild(iconChevron)
+
     colorsWrapper.append(labelBallColor, labelLineColor)
 
-    divPendulumAttributes.append(labelSpeed, labelLength, labelDegrees, colorsWrapper)
+    divPendulumAttributes.append(divPendulumNumberInputs, colorsWrapper)
 
     divPendulumAttributesWrapper.append(divPendulumAttributes)
 
@@ -557,8 +568,8 @@ function toDegrees(radians) {
 }
 
 function resizeCanvas() {
-    canvas.width = innerWidth
-    canvas.height = innerHeight
+    canvas.width = canvas.getBoundingClientRect().width
+    canvas.height = canvas.getBoundingClientRect().height
 }
 
 function setUpCanvas() {
@@ -617,6 +628,12 @@ const DEFAULT_PENDULUM_RADIANS = Math.PI / 2
 const canvas = document.getElementById('chaotic-pendulum-canvas')
 const ctx = canvas.getContext('2d')
 
+const observer = new ResizeObserver(() => {
+    resizeCanvas()
+    draw()
+})
+observer.observe(canvas)
+
 const divPendulumInfo = document.querySelector('.pendulum-info')
 const divPendulumParts = document.querySelector('.pendulum-parts')
 
@@ -664,30 +681,30 @@ btnZoomOut.addEventListener('click', function() {
 
 addEventListener('resize', resizeCanvas)
 
-document.addEventListener('touchstart', function(event) {
+canvas.addEventListener('touchstart', function(event) {
     const touch = event.touches[0]
     handleStartMove(touch.clientX, touch.clientY)
 })
 
-document.addEventListener('touchmove', function(event) {
+canvas.addEventListener('touchmove', function(event) {
     const touch = event.touches[0]
     handleMove(touch.clientX, touch.clientY)
 })
 
-document.addEventListener('touchend', handleStopMove)
+canvas.addEventListener('touchend', handleStopMove)
 
 
-document.addEventListener('mousedown',  function(event) {
+canvas.addEventListener('mousedown',  function(event) {
     handleStartMove(event.x, event.y)
 })
-document.addEventListener('mousemove',  function(event) {
+canvas.addEventListener('mousemove',  function(event) {
     if (!isHolding) return
 
     handleMove(event.x, event.y)
 })
 document.addEventListener('mouseup', handleStopMove)
 
-document.addEventListener('wheel', function(e) {
+canvas.addEventListener('wheel', function(e) {
     const zoom = e.deltaY < 0 ? ZOOM_IN : ZOOM_OUT
 
     zoomCanvas(zoom)
