@@ -4,14 +4,36 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chaotic Pendulum</title>
+    <link rel="shortcut icon" href="./favicon.png" type="image/x-icon">
     <link rel="stylesheet" href="./style.css">
     <script src="./main.js" defer></script>
 </head>
 <body>
     <main>
         <div class="chaotic-pendulum-container">
-            <canvas id="chaotic-pendulum-canvas"></canvas>
+            <div class="pendulum-controller">
+                <button type="button" class="btn-play">
+                    <div class="icon-play"></div>
+                </button>
+                <button type="button" class="btn-pause hidden">
+                    <div class="icon-pause"></div>
+                </button>
+    
+                <div class="zoom-container">
+                    <button type="button" class="btn-zoom-in">
+                        <div class="icon-plus"></div>
+                    </button>
+    
+                    <button type="button" class="btn-zoom-out">
+                        <div class="icon-minus"></div>
+                    </button>
+                </div>
+            </div>
 
+            <canvas id="chaotic-pendulum-canvas"></canvas>
+        </div>
+
+        <div class="pendulum-info-container">
             <div class="pendulum-info">
                 <button type="button" class="btn-close">
                     <div class="icon-chevron"></div>
@@ -22,30 +44,13 @@
                         <!-- the pendulums are created here -->
                     </div>
 
-                    <div class="btn-add-wrapper">
-                        <button type="button" class="btn-add">
-                            <div class="icon-add-wrapper">
-                                <div class="icon-plus"></div>
-                            </div>
-                            <span class="btn-add-text">Add Pendulum</span>
-                        </button>
-                    </div>
+                    <button type="button" class="btn-add">
+                        <div class="icon-add-wrapper">
+                            <div class="icon-plus"></div>
+                        </div>
+                        <span class="btn-add-text">Add Pendulum</span>
+                    </button>
                 </div>
-            </div>
-        </div>
-
-        <div class="pendulum-controller">
-            <button type="button" class="btn-play"></button>
-            <button type="button" class="btn-pause hidden"></button>
-
-            <div class="zoom-container">
-                <button type="button" class="btn-zoom-in">
-                    <div class="icon-plus"></div>
-                </button>
-
-                <button type="button" class="btn-zoom-out">
-                    <div class="icon-minus"></div>
-                </button>
             </div>
         </div>
     </main>

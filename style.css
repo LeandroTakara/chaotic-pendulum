@@ -11,23 +11,25 @@
     --color-controller-play-pause: rgb(14, 232, 14);
     
     /* pendulum info */
+    --width-pendulum-info: 100%;
+    --height-pendulum-info: 300px;
     --bg-color-pendulum-parts: rgb(224, 224, 224);
-    --time-close-pendulum-info: .6s;
+    --time-close-pendulum-info: 0.6s;
 
     /* pendulum */
     --color-btn-remove-pendulum: rgb(220, 38, 38);
     --color-btn-minimize-pendulum: rgb(25, 102, 217);
-    --time-minimize-pendulum: .6s;
+    --time-minimize-pendulum: 0.6s;
 }
 
-/* general */
+/* general style */
 
 button {
     cursor: pointer;
     background-color: transparent;
 }
 
-/* icons */
+/* icons (classes that represent icons, avoid having to recreate them for the elements in which they will be used) */
 
 .icon-plus {
     --color: black;
@@ -36,20 +38,20 @@ button {
     position: relative;
     width: var(--size);
     height: var(--size);
-}
-.icon-plus::before, .icon-plus::after {
-    content: "";
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    translate: -50% -50%;
-    width: 60%;
-    height: 12%;
-    border-radius: 10px;
-    background-color: var(--color);
-}
-.icon-plus::after {
-    rotate: z 90deg;
+
+    &::before, &::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        translate: -50% -50%;
+        width: 60%;
+        height: 12%;
+        border-radius: 10px;
+        background-color: var(--color);
+    }
+
+    &::after { rotate: z 90deg; }
 }
 
 .icon-minus {
@@ -59,17 +61,18 @@ button {
     position: relative;
     width: var(--size);
     height: var(--size);
-}
-.icon-minus::before {
-    content: "";
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    translate: -50% -50%;
-    width: 60%;
-    height: 12%;
-    border-radius: 10px;
-    background-color: var(--color);
+
+    &::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        translate: -50% -50%;
+        width: 60%;
+        height: 12%;
+        border-radius: 10px;
+        background-color: var(--color);
+    }
 }
 
 .icon-chevron {
@@ -79,24 +82,27 @@ button {
     position: relative;
     width: var(--size);
     height: var(--size);
-}
-.icon-chevron::before, .icon-chevron::after {
-    content: "";
-    position: absolute;
-    top: 53%;
-    translate: -50% -50%;
-    width: 50%;
-    height: 12%;
-    background-color: var(--color);
-    border-radius: 10px;
-}
-.icon-chevron::before {
-    left: 35%;
-    rotate: z 45deg;
-}
-.icon-chevron::after {
-    left: 65%;
-    rotate: z -45deg;
+
+    &::before, &::after {
+        content: "";
+        position: absolute;
+        top: 53%;
+        translate: -50% -50%;
+        width: 50%;
+        height: 12%;
+        background-color: var(--color);
+        border-radius: 10px;
+    }
+
+    &::before {
+        left: 35%;
+        rotate: z 45deg;
+    }
+
+    &::after {
+        left: 65%;
+        rotate: z -45deg;
+    }
 }
 
 .icon-x {
@@ -106,66 +112,204 @@ button {
     position: relative;
     width: var(--size);
     height: var(--size);
-}
-.icon-x::before, .icon-x::after {
-    content: "";
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    translate: -50% -50%;
-    width: 60%;
-    height: 12%;
-    border-radius: 10px;
-    background-color: var(--color);
-}
-.icon-x::before {
-    rotate: z 45deg;
-}
-.icon-x::after {
-    rotate: z -45deg;
+
+    &::before, &::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        translate: -50% -50%;
+        width: 60%;
+        height: 12%;
+        border-radius: 10px;
+        background-color: var(--color);
+    }
+
+    &::before { rotate: z 45deg; }
+    &::after { rotate: z -45deg; }
 }
 
-/* styling */
+.icon-play {
+    --color: black;
+    --size: 0;
+
+    position: relative;
+    width: var(--size);
+    height: var(--size);
+
+    &::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 58%;
+        translate: -50% -50%;
+        border-left: solid var(--color) calc(var(--size) / 2.5);
+        border-top: solid transparent calc(var(--size) / 3.6);
+        border-bottom: solid transparent calc(var(--size) / 3.6);
+    }
+}
+
+.icon-pause {
+    --color: black;
+    --size: 0;
+
+    position: relative;
+    width: var(--size);
+    height: var(--size);
+
+    &::before, &::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        translate: -50% -50%;
+        height: 50%;
+        width: 15%;
+        background-color: var(--color);
+    }
+
+    &::before { left: 35%; }
+    &::after { left: 65%; }
+}
+
+.icon-ball {
+    --color: black;
+    --size: 0;
+
+    position: relative;
+    width: var(--size);
+    height: var(--size);
+
+    &::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        translate: -50% -50%;
+        width: 100%;
+        height: 100%;
+        border-radius: 100%;
+        background-color: var(--color);
+    }
+}
+
+.icon-line {
+    --color: black;
+    --size: 0;
+
+    position: relative;
+    width: var(--size);
+    height: var(--size);
+
+    &::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        translate: -50% -50%;
+        width: var(--size);
+        height: calc(var(--size) * 0.2);
+        border-radius: 10px;
+        rotate: z -45deg;
+        background-color: var(--color);
+    }
+}
+
+/* main style */
 
 html {
     font-size: 16px;
 }
 
 body {
-    height: 100svh;
-    overflow: hidden;
+    height: 100dvh; /* dvh for mobile adaptation */
     background-color: black;
+    overflow: hidden;
 }
 
 main {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
     height: 100%;
 }
 
 .chaotic-pendulum-container {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-}
-
-#chaotic-pendulum-canvas {
-    display: block;
-    width: 100%;
     flex-grow: 1;
     overflow: hidden;
 }
 
+/* canvas */
+#chaotic-pendulum-canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+/* canvas controller */
+
+.pendulum-controller {
+    position: relative;
+    width: 100%;
+}
+
+/* play and pause buttons */
+.btn-play, .btn-pause {
+    display: block;
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    translate: -50%;
+    border-radius: 100%;
+    border: solid white 2px;
+    background-color: black;
+
+    &.hidden { display: none; }
+}
+
+.btn-play .icon-play, .btn-pause .icon-pause {
+    --size: 20px;
+    --color: var(--color-controller-play-pause);
+}
+
+/* zoom in and out buttons */
+.zoom-container {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    border: solid white 2px;
+    border-radius: 10px;
+    background-color: black;
+}
+
+.btn-zoom-in, .btn-zoom-out {
+    display: block;
+}
+
+.btn-zoom-in {
+    border-bottom: solid white 2px;
+}
+
+.btn-zoom-in .icon-plus, .btn-zoom-out .icon-minus {
+    --color: white;
+    --size: 30px;
+}
+
 /* pendulum info */
+
+.pendulum-info-container {
+    max-height: var(--height-pendulum-info);
+    box-shadow: 0 0 20px 5px rgba(255, 255, 255, 0.2);
+    transition-property: max-height, box-shadow;
+    transition-duration: var(--time-close-pendulum-info);
+}
 
 .pendulum-info {
     position: relative;
     width: 100%;
-    height: 300px;
-    box-shadow: 0 0 20px 5px rgba(255, 255, 255, 0.2);
-    transition: var(--time-close-pendulum-info);
+    height: var(--height-pendulum-info);
 }
 
-/* pendulum info close button */
-
+/* close button */
 .btn-close {
     position: absolute;
     top: 0;
@@ -176,43 +320,52 @@ main {
     background-color: white;
     box-shadow: 0 0 20px 5px rgba(255, 255, 255, 0.2);
     z-index: 1;
-    transition: var(--time-close-pendulum-info);
-}
-.btn-close .icon-chevron {
-    --size: 30px;
-}
-.btn-close .icon-chevron::before, .btn-close .icon-chevron::after {
-    transition: var(--time-close-pendulum-info);
+    transition-property: top;
+    transition-duration: var(--time-close-pendulum-info);
+
+    .icon-chevron {
+        --size: 30px;
+
+        /* sets the transition */
+        &::before, &::after {
+            transition-property: top, rotate;
+            transition-duration: var(--time-close-pendulum-info);
+        }
+    }
 }
 
 /* pendulum info (closed) */
-
-.pendulum-info.closed {
-    height: 0;
+.pendulum-info-container.closed {
+    max-height: 0;
     box-shadow: none;
-}
-.pendulum-info.closed .btn-close {
-    --size: 40px;
 
-    top: -30px;
-}
-.pendulum-info.closed .btn-close .icon-chevron::before {
-    top: 47%;
-    rotate: z -45deg;
-}
-.pendulum-info.closed .btn-close .icon-chevron::after {
-    top: 47%;
-    rotate: z 45deg;
+    .btn-close {
+        --size: 40px;
+
+        top: -10%;
+
+        .icon-chevron::before {
+            top: 47%;
+            rotate: z -45deg;
+        }
+
+        .icon-chevron::after {
+            top: 47%;
+            rotate: z 45deg;
+        }
+    }
 }
 
 /* pendulum info content */
 
 .pendulum-parts-container {
-    height: 300px;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
 }
 
 .pendulum-parts {
-    height: 70%;
+    height: 100%;
     padding: 10px 20px 0;
     border-bottom: solid black 2px;
     background-color: var(--bg-color-pendulum-parts);
@@ -222,20 +375,18 @@ main {
 /* pendulum */
 .pendulum {
     position: relative;
-    margin: 20px 0;
+    max-width: 400px;
+    margin: 20px auto;
     border: solid black 2px;
     border-radius: 12px;
     background-color: white;
-}
-
-.pendulum-attributes-wrapper {
     padding: 10px;
 }
 
 .pendulum-attributes {
     position: relative;
     height: 100px;
-    transition: var(--time-minimize-pendulum);
+    transition: height var(--time-minimize-pendulum);
 }
 
 .pendulum-number-inputs {
@@ -243,6 +394,21 @@ main {
     flex-wrap: wrap;
     width: 100%;
     height: 100%;
+    transition: opacity var(--time-minimize-pendulum) cubic-bezier(0, 1, 1, 1);
+}
+
+.colors-wrapper {
+    display: flex;
+    justify-content: center;
+    column-gap: 20px;
+    position: absolute;
+    top: 75%;
+    left: 75%;
+    translate: -50% -50%;
+    width: 50%;
+    height: 50%;
+    transition-property: top, left, width, height;
+    transition-duration: var(--time-minimize-pendulum);
 }
 
 /* pendulum number input */
@@ -251,8 +417,18 @@ main {
     height: 50%;
     text-transform: uppercase;
     text-align: center;
-    transition: var(--time-minimize-pendulum);
+    transition-duration: var(--time-minimize-pendulum);
 }
+
+.pendulum-input-info-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: end;
+    height: 50%;
+}
+.pendulum-input-info {
+    font-size: 0.9rem;
+} 
 
 .pendulum-input-number {
     display: block;
@@ -265,59 +441,38 @@ main {
 }
 
 /* pendulum color input */
-.colors-wrapper {
-    display: flex;
-    justify-content: center;
-    gap: 30px;
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    width: 50%;
-    height: 50%;
-    transition: var(--time-minimize-pendulum);
-}
-
 .pendulum-color-attribute {
+    display: flex;
+    flex-direction: column;
     position: relative;
-    width: 25px;
     height: 100%;
-    transition: var(--time-minimize-pendulum);
 }
 
 .icon-wrapper {
-    position: absolute;
-    top: 0;
     display: flex;
-    align-items: center;
     justify-content: center;
-    width: 25px;
-    height: 25px;
-}
-.ball-icon {
-    width: 15px; 
-    height: 15px;
-    border-radius: 100%;
-    background-color: black;
-}
-.line-icon{
-    width: 22px;
-    height: 4px; 
-    border-radius: 10px;
-    rotate: z -45deg;
-    background-color: black;
+    align-items: center;
+    height: 50%;
+    aspect-ratio: 1 / 1;
+
+    .icon-ball {
+        --size: 15px;
+    }
+
+    .icon-line {
+        --size: 20px;
+    }
 }
 
 .pendulum-input-color-wrapper {
-    position: absolute;
-    bottom: 0;
-    width: 25px;
-    height: 25px;
+    position: relative;
+    height: 50%;
+    aspect-ratio: 1 / 1;
     border: dashed black 2px;
     border-radius: 100%;
     overflow: hidden;
-    transition: var(--time-minimize-pendulum);
+    transition: border-radius var(--time-minimize-pendulum);
 }
-
 .pendulum-input-color {
     position: absolute;
     top: 50%;
@@ -338,11 +493,11 @@ main {
     border: solid var(--color-btn-remove-pendulum) 2px;
     border-radius: 100%;
     background-color: white;
-}
 
-.btn-close-pendulum .icon-x {
-    --size: 20px;
-    --color: var(--color-btn-remove-pendulum);
+    .icon-x {
+        --size: 20px;
+        --color: var(--color-btn-remove-pendulum);
+    }
 }
 
 .btn-minimize-pendulum {
@@ -353,154 +508,172 @@ main {
     border: solid var(--color-btn-minimize-pendulum) 2px;
     border-radius: 100%;
     background-color: white;
-}
-.btn-minimize-pendulum .icon-chevron {
-    --size: 20px;
-    --color: var(--color-btn-minimize-pendulum);
-}
-.btn-minimize-pendulum .icon-chevron::before, .btn-minimize-pendulum .icon-chevron::after {
-    transition: var(--time-minimize-pendulum);
+
+    .icon-chevron {
+        --size: 20px;
+        --color: var(--color-btn-minimize-pendulum);
+
+        /* sets the transition */
+        &::before, &::after {
+            transition-property: top, rotate;
+            transition-duration: var(--time-minimize-pendulum);
+        }
+    }
 }
 
 /* pendulum (minimized) */
 
-.pendulum.minimized .pendulum-attributes {
-    height: 30px;
-}
+.pendulum.minimized {
+    .pendulum-attributes {
+        height: 30px;
+    }
 
-.pendulum.minimized .pendulum-number-attribute {
-    opacity: 0;
-    pointer-events: none;
-}
+    .pendulum-number-inputs {
+        opacity: 0;
+        pointer-events: none;
+    }
 
-.pendulum.minimized .colors-wrapper {
-    bottom: 50%;
-    right: 50%;
-    translate: 50% 50%;
-    width: 80%;
-    height: 100%;
-}
+    .colors-wrapper {
+        top: 50%;
+        left: 50%;
+        width: 80%;
+        height: 100%;
+    }
 
-.pendulum.minimized .pendulum-color-attribute {
-    width: 50%;
-}
+    .pendulum-color-attribute {
+        flex-direction: row;
+        align-items: center;
+        column-gap: 10px;
+        width: 50%;
+    }
 
-.pendulum.minimized .icon-wrapper {
-    top: 50%;
-    translate: 0 -50%;
-}
+    .pendulum-input-color-wrapper {
+        width: 100%;
+        border-radius: 0;
+    }
 
-.pendulum.minimized .pendulum-input-color-wrapper {
-    bottom: 50%;
-    left: 25px;
-    translate: 0 50%;
-    width: 80px;
-    border-radius: 0;
-}
+    .btn-minimize-pendulum .icon-chevron {
+        &::before {
+            top: 47%;
+            rotate: z -45deg;
+        }
 
-.pendulum.minimized .icon-chevron::before {
-    top: 47%;
-    rotate: z -45deg;
-}
-.pendulum.minimized .icon-chevron::after {
-    top: 47%;
-    rotate: z 45deg;
+        &::after {
+            top: 47%;
+            rotate: z 45deg;
+        }
+    }
 }
 
 /* add button */
-
-.btn-add-wrapper {
-    height: 30%;
-    background-color: white;
-}
 .btn-add {
     display: flex;
     align-items: center;
-    column-gap: 10px;
-    height: 100%;
+    justify-content: center;
+    column-gap: 15px;
+    height: 60px;
+    width: 100%;
     margin: 0 auto;
     text-transform: uppercase;
     letter-spacing: 4px;
     color: black;
+    background-color: white;
 }
 .btn-add .icon-add-wrapper {
-    border: solid black 4px;
+    border: solid black 3px;
     border-radius: 100%;
 }
-.btn-add .icon-plus {
-    --size: 40px;
+.btn-add .icon-add-wrapper .icon-plus {
+    --size: 30px;
 }
-.btn-add-text {
-    font-size: 1rem;
+.btn-add .btn-add-text {
+    font-size: 1.1rem;
     font-weight: 900;
 }
 
-/* canvas controller */
+@media (orientation: landscape) {
+    :root {
+        --width-pendulum-info: 300px;
+        --height-pendulum-info: 100%;
+    }
 
-.btn-play, .btn-pause {
-    display: block;
-    position: absolute;
-    top: 5%;
-    left: 50%;
-    translate: -50% -50%;
-    width: 30px;
-    height: 30px;
-    margin: 0 auto;
-    border-radius: 100%;
-    border: solid white 3px;
-    background-color: black;
-}
-.btn-play.hidden, .btn-pause.hidden {
-    display: none;
-}
+    main {
+        flex-direction: row-reverse;
+    }
 
-.btn-play::before {
-    content: "";
-    position: absolute;
-    top: 50%;
-    left: 55%;
-    translate: -50% -50%;
-    border-left: solid var(--color-controller-play-pause) 10px;
-    border-top: solid transparent 7px;
-    border-bottom: solid transparent 7px;
-}
+    .pendulum-info-container {
+        max-width: var(--width-pendulum-info);
+        transition-property: max-width, box-shadow;
+    }
 
-.btn-pause::before, .btn-pause::after {
-    content: "";
-    position: absolute;
-    top: 50%;
-    translate: -50% -50%;
-    height: 50%;
-    width: 12%;
-    background-color: var(--color-controller-play-pause);
-}
-.btn-pause::before {
-    left: 38%;
-}
-.btn-pause::after {
-    left: 62%;
-}
+    .pendulum-info {
+        left: 0;
+        width: var(--width-pendulum-info);
+        height: 100%;
+        transition: left var(--time-close-pendulum-info);
+    }
 
-.zoom-container {
-    position: absolute;
-    right: 3%;
-    top: 5%;
-    border: solid white 2px;
-    border-radius: 10px;
-}
-.btn-zoom-in, .btn-zoom-out {
-    display: block;
+    .btn-close {
+        left: 100%;
+        translate: 0;
+        rotate: 90deg;
+        border-radius: 100% 100% 0 0;
+        border: none;
+        background-color: var(--bg-color-pendulum-parts);
+    }
+
+    .pendulum-info-container.closed {
+        max-width: 0;
+        max-height: none;
+
+        .pendulum-info {
+            left: calc(var(--width-pendulum-info) * -1);
+        }
+
+        .btn-close {
+            top: 0;
+        }
+    }
+
+    .pendulum-parts-container {
+        width: 100%;
+    }
 }
 
-.btn-zoom-in {
-    border-bottom: solid white 2px;
-}
-.btn-zoom-in .icon-plus {
-    --color: white;
-    --size: 40px;
-}
+@media (width > 1000px) {
+    :root {
+        --width-pendulum-info: 400px;
+    }
 
-.btn-zoom-out .icon-minus {
-    --color: white;
-    --size: 40px;
+    html {
+        font-size: 18px;
+    }
+
+    /* canvas controller */
+
+    /* play and pause buttons */
+    .btn-play, .btn-pause {
+        border-width: 3px;
+    }
+
+    .btn-play .icon-play, .btn-pause .icon-pause {
+        --size: 30px;
+    }
+
+    /* zoom in and out buttons */
+    .btn-zoom-in .icon-plus, .btn-zoom-out .icon-minus {
+        --size: 40px;
+    }
+
+    /* pendulum info */
+
+    /* pendulum */
+    .pendulum-attributes {
+        height: 120px;
+    }
+
+    /* add button */
+    .btn-add .icon-add-wrapper .icon-plus {
+        --size: 40px;
+    }
 }

@@ -13,12 +13,13 @@ class Pendulum {
     #next
 
     /**
+     * Create a pendulum
      * @param {CanvasRenderingContext2D} ctx canvas 2d context
      * @param {number} startX start x coordinate
      * @param {number} startY start y coordinate
      * @param {number} length pendulum length
      * @param {number} angularSpeed pendulum angular speed
-     * @param {number} [radians = 0] start radians
+     * @param {number} [radians = 0] start radians (default 0)
      */
     constructor(ctx, startX, startY, length, angularSpeed, radians = 0) {
         this.ctx = ctx
@@ -118,7 +119,7 @@ class Pendulum {
      * Draws the pendulum
      */
     draw() {
-        // draw a line connecting the start position to the end
+        // draws a line connecting the start position to the end
         this.ctx.save()
         this.ctx.beginPath()
         this.ctx.strokeStyle = this.lineColor
@@ -129,7 +130,7 @@ class Pendulum {
         this.ctx.closePath()
         this.ctx.restore()
 
-        // draw the ball on the end position
+        // draws the ball on the end position
         this.ctx.save()
         this.ctx.beginPath()
         this.ctx.fillStyle = this.ballColor
@@ -152,7 +153,7 @@ class Pendulum {
             // because the elements ahead will have a definitely change once their previous element is updated
             this.next.#startX = this.endX
             this.next.#startY = this.endY
-            
+
             this.next.update()
         }
     }
@@ -178,6 +179,7 @@ class ChaoticPendulum {
     lastPendulum
 
     /**
+     * Creates a chaotic pendulum
      * @param {CanvasRenderingContext2D} ctx canvas 2d context
      * @param {number} x x coordinate
      * @param {number} y y coordinate
@@ -369,9 +371,14 @@ function createHTMLPendulumAttributeNumber(attribute, initialValue, inputCallbac
     const label = document.createElement('label')
     label.className = 'pendulum-number-attribute'
 
+    const spanWrapper = document.createElement('div')
+    spanWrapper.className = 'pendulum-input-info-wrapper'
+
     const span = document.createElement('span')
     span.className = 'pendulum-input-info'
     span.innerText = attribute + ':'
+
+    spanWrapper.appendChild(span)
 
     const input = document.createElement('input')
     input.className = 'pendulum-input-number'
@@ -381,7 +388,7 @@ function createHTMLPendulumAttributeNumber(attribute, initialValue, inputCallbac
 
     if (reflectCallback) updateInputs.push({ input, update: reflectCallback })
 
-    label.append(span, input)
+    label.append(spanWrapper, input)
 
     return label
 }
@@ -404,7 +411,6 @@ function createHTMLPendulumAttributeColor(iconName, initialValue, inputCallback)
     icon.className = iconName
 
     iconWrapper.appendChild(icon)
-
 
     const inputWrapper = document.createElement('div')
     inputWrapper.className = 'pendulum-input-color-wrapper'
@@ -429,9 +435,6 @@ function createHTMLPendulumAttributeColor(iconName, initialValue, inputCallback)
 function createHTMLPendulum(pendulum) {
     const divPendulum = document.createElement('div')
     divPendulum.className = 'pendulum'
-
-    const divPendulumAttributesWrapper = document.createElement('div')
-    divPendulumAttributesWrapper.className = 'pendulum-attributes-wrapper'
 
     const divPendulumAttributes = document.createElement('div')
     divPendulumAttributes.className = 'pendulum-attributes'
@@ -466,12 +469,12 @@ function createHTMLPendulum(pendulum) {
     const colorsWrapper = document.createElement('div')
     colorsWrapper.className = 'colors-wrapper'
 
-    const labelBallColor = createHTMLPendulumAttributeColor('ball-icon', pendulum.ballColor, function(value) {
+    const labelBallColor = createHTMLPendulumAttributeColor('icon-ball', pendulum.ballColor, function(value) {
         pendulum.ballColor = value
         draw()
     })
 
-    const labelLineColor = createHTMLPendulumAttributeColor('line-icon', pendulum.lineColor, function(value) {
+    const labelLineColor = createHTMLPendulumAttributeColor('icon-line', pendulum.lineColor, function(value) {
         pendulum.lineColor = value
         draw()
     })
@@ -506,9 +509,7 @@ function createHTMLPendulum(pendulum) {
 
     divPendulumAttributes.append(divPendulumNumberInputs, colorsWrapper)
 
-    divPendulumAttributesWrapper.append(divPendulumAttributes)
-
-    divPendulum.append(divPendulumAttributesWrapper, btnRemovePendulum, btnMinimize)
+    divPendulum.append(divPendulumAttributes, btnRemovePendulum, btnMinimize)
 
     return divPendulum
 }
@@ -634,7 +635,7 @@ const observer = new ResizeObserver(() => {
 })
 observer.observe(canvas)
 
-const divPendulumInfo = document.querySelector('.pendulum-info')
+const divPendulumInfoContainer = document.querySelector('.pendulum-info-container')
 const divPendulumParts = document.querySelector('.pendulum-parts')
 
 const chaoticPendulum = new ChaoticPendulum(ctx, 0, 0)
@@ -652,7 +653,7 @@ let animationFrame = null
 
 const btnClose = document.querySelector('.btn-close')
 btnClose.addEventListener('click', function() {
-    divPendulumInfo.classList.toggle('closed')
+    divPendulumInfoContainer.classList.toggle('closed')
 })
 
 const btnAddPart = document.querySelector('.btn-add')
