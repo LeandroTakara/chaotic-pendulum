@@ -613,7 +613,7 @@ function createHTMLPendulum(pendulum) {
 }
 
 /**
- * Creates a pendulum and the HTML element representing it and returns it
+ * Creates a pendulum and the HTML element representing it and returns the element
  * @returns an element representing the pendulum
  */
 function createPendulum() {
@@ -624,12 +624,18 @@ function createPendulum() {
     return HTMLPendulum
 }
 
+/**
+ * Adds a new pendulum to the pendulum info and to the chaoticPendulum
+ */
 function addPendulum() {
     divPendulumParts.appendChild(createPendulum())
     draw()
     chaoticPendulum.resetTrail()
 }
 
+/**
+ * Toggles the pendulum info menu
+ */
 function togglePendulumInfo() {
     divPendulumInfoContainer.classList.toggle('closed')
 }
@@ -687,6 +693,9 @@ function update() {
     updateInputObjs.forEach(inputObj => inputObj.update())
 }
 
+/**
+ * Start the canvas animation
+ */
 function startAnimation() {
     animationFrame = requestAnimationFrame(updateAnimation)
 
@@ -695,6 +704,9 @@ function startAnimation() {
     btnPause.classList.remove('hidden')
 }
 
+/**
+ * Updates the canvas animation
+ */
 function updateAnimation() {
     animationFrame = requestAnimationFrame(updateAnimation)
 
@@ -702,6 +714,9 @@ function updateAnimation() {
     draw()
 }
 
+/**
+ * Stops the canvas animation
+ */
 function stopAnimation() {
     cancelAnimationFrame(animationFrame)
 
@@ -710,26 +725,35 @@ function stopAnimation() {
     btnPlay.classList.remove('hidden')
 }
 
+/**
+ * Converts degrees into radians
+ * @param {number} degrees degrees
+ * @returns radians
+ */
 function toRadians(degrees) {
     return degrees * Math.PI / 180
 }
 
+/**
+ * Converts radians into degrees
+ * @param {number} radians radians
+ * @returns degrees
+ */
 function toDegrees(radians) {
     return radians * 180 / Math.PI
 }
 
-function resizeCanvas() {
-    canvas.width = canvas.getBoundingClientRect().width
-    canvas.height = canvas.getBoundingClientRect().height
-}
 
 function setUpCanvas() {
     const observer = new ResizeObserver(() => {
         const oldWidth = canvas.width
         const oldHeight = canvas.height
 
-        resizeCanvas()
+        // resizes the canvas
+        canvas.width = canvas.getBoundingClientRect().width
+        canvas.height = canvas.getBoundingClientRect().height
 
+        // calculates the new x and y based on the new canvas width and height
         const newX = canvasObj.x * canvas.width / oldWidth
         const newY = canvasObj.y * canvas.height / oldHeight
 
@@ -744,12 +768,20 @@ function setUpCanvas() {
     draw()
 }
 
+/**
+ * @param {number} x x
+ * @param {number} y y
+ */
 function handleStartMove(x, y) {
     prevX = x
     prevY = y
     isHolding = true
 }
 
+/**
+ * @param {number} x x
+ * @param {number} y y
+ */
 function handleMove(x, y) {
     const offsetX = x - prevX
     const offsetY = y - prevY
@@ -767,6 +799,9 @@ function handleStopMove() {
     isHolding = false
 }
 
+/**
+ * @param {number} zoom zoom
+ */
 function zoom(zoom) {
     return function() {
         canvasObj.zoom(zoom)
