@@ -12,14 +12,18 @@ Everything is customizable, feel free to try anything!
 
 ![preview](https://github.com/devswordfish/chaotic-pendulum/assets/62572529/8694e34b-249e-4c78-8989-2937d4f226c4)
 
+## Build with
+
+- HTML
+- CSS
+- JavaScript
+
 ## Getting started
 
-1. Clone the repo
+Clone the repo:
 ```
 git clone https://github.com/devswordfish/chaotic-pendulum.git
 ```
-
-2. Open the project in your code editor
 
 ## License
 
