@@ -12,19 +12,37 @@
     <main>
         <div class="chaotic-pendulum-container">
             <div class="pendulum-controller">
-                <button type="button" class="btn-play">
-                    <div class="icon-play"></div>
-                </button>
-                <button type="button" class="btn-pause hidden">
-                    <div class="icon-pause"></div>
-                </button>
+                <div class="trails">
+                    <label class="trails-label">
+                        Trails:
+
+                        <div class="trails-container">
+                            <button type="button" id="btn-remove-trail">
+                                <div class="icon-chevron"></div>
+                            </button>
+                            <input type="number" value="10" id="input-trails" min="0" max="999999">
+                            <button type="button" id="btn-add-trail">
+                                <div class="icon-chevron"></div>
+                            </button>
+                        </div>
+                    </label>
+                </div>
+
+                <div class="play-pause-container">
+                    <button type="button" id="btn-play">
+                        <div class="icon-play"></div>
+                    </button>
+                    <button type="button" id="btn-pause" class="hidden">
+                        <div class="icon-pause"></div>
+                    </button>
+                </div>
     
                 <div class="zoom-container">
-                    <button type="button" class="btn-zoom-in">
+                    <button type="button" id="btn-zoom-in">
                         <div class="icon-plus"></div>
                     </button>
     
-                    <button type="button" class="btn-zoom-out">
+                    <button type="button" id="btn-zoom-out">
                         <div class="icon-minus"></div>
                     </button>
                 </div>
@@ -35,7 +53,7 @@
 
         <div class="pendulum-info-container">
             <div class="pendulum-info">
-                <button type="button" class="btn-close">
+                <button type="button" id="btn-close">
                     <div class="icon-chevron"></div>
                 </button>
 
@@ -44,7 +62,7 @@
                         <!-- the pendulums are created here -->
                     </div>
 
-                    <button type="button" class="btn-add">
+                    <button type="button" id="btn-add">
                         <div class="icon-add-wrapper">
                             <div class="icon-plus"></div>
                         </div>

@@ -119,7 +119,14 @@ class Pendulum {
      * Draws the pendulum
      */
     draw() {
-        // draws a line connecting the start position to the end
+        this.drawLine()
+        this.drawBall()
+    }
+
+    /**
+     * Draws the line
+     */
+    drawLine() {
         this.ctx.save()
         this.ctx.beginPath()
         this.ctx.strokeStyle = this.lineColor
@@ -129,8 +136,12 @@ class Pendulum {
         this.ctx.stroke()
         this.ctx.closePath()
         this.ctx.restore()
+    }
 
-        // draws the ball on the end position
+    /**
+     * Draws the ball
+     */
+    drawBall() {
         this.ctx.save()
         this.ctx.beginPath()
         this.ctx.fillStyle = this.ballColor
@@ -216,15 +227,21 @@ class ChaoticPendulum {
         if (this.firstPendulum) this.firstPendulum.startY = value
     }
 
-    get maxTrail() {
+    get maxTrails() {
         return this.#maxTrails
     }
 
-    set maxTrail(value) {
+    set maxTrails(value) {
         this.#maxTrails = value
 
-        // removes the excess trail
-        this.trails.splice(value)
+        this.resetTrail()
+    }
+    
+    /**
+     * Resets the trail
+     */
+    resetTrail() {
+        this.trails.splice(0)
     }
 
     /**
@@ -232,16 +249,21 @@ class ChaoticPendulum {
      * @param {number} length pendulum length
      * @param {number} angularSpeed pendulum angular speed
      * @param {number} radians start radians
+     * @returns {Pendulum} pendulum
      */
     createPendulum(length, angularSpeed, radians) {
         let pendulum = null
         
-        if (this.firstPendulum === null) {
+        if (this.firstPendulum === null) { // root pendulum does not exists
             pendulum = new Pendulum(this.ctx, this.x, this.y, length, angularSpeed, radians)
+
+            // assigns the first and last reference of the pendulum
             this.firstPendulum = pendulum
             this.lastPendulum = pendulum
-        } else {
+        } else { // root pendulum exists
             pendulum = new Pendulum(this.ctx, this.lastPendulum.endX, this.lastPendulum.endY, length, angularSpeed, radians)
+
+            // changes the reference to the last pendulum, because a new one was created
             this.lastPendulum.next = pendulum
             this.lastPendulum = this.lastPendulum.next
         }
@@ -254,11 +276,11 @@ class ChaoticPendulum {
      * @param {Pendulum} pendulum pendulum to be removed
      */
     removePendulum(pendulum) {
-        if (pendulum === this.firstPendulum) {
+        if (pendulum === this.firstPendulum) { // the root is being removed
             this.firstPendulum = this.firstPendulum.next
 
             this.firstPendulum?.setPosition(pendulum.startX, pendulum.startY)
-        } else {
+        } else { // some pendulum is being removed
             let runner = this.firstPendulum
 
             while (runner.next !== pendulum) {
@@ -277,45 +299,73 @@ class ChaoticPendulum {
      * Draws the entire pendulum chain and the trails
      */
     draw() {
+        this.drawTrails()
+        this.drawPendulum()
+    }
+
+    /**
+     * Draws the pendulum
+     */
+    drawPendulum() {
+        // draws the lines
         let runner = this.firstPendulum
 
         while (runner) {
-            runner.draw()
+            runner.drawLine()
             runner = runner.next
         }
 
+        // draws the balls
+        runner = this.firstPendulum
+
+        while (runner) {
+            runner.drawBall()
+            runner = runner.next
+        }
+    }
+
+    /**
+     * Draws the trails
+     */
+    drawTrails() {
         this.trails.forEach(trail => trail.draw())
     }
 
     /**
      * Updates the entire pendulum chain and the trails
      */
-    update() {
-        // updates the pendulum chain
-        this.firstPendulum?.update()
-
+    update() {        
         if (this.firstPendulum) {
+            // updates the pendulum chain
+            this.firstPendulum.update()
+
             // updates the trails
-            this.trails.forEach((trail, i) => trail.setOpacityValue(i, this.maxTrail))
+            this.trails.forEach((trail, i) => trail.opacity = 1 - i / this.maxTrails)
 
             // creates a new trail
             this.#createTrail(this.lastPendulum.endX, this.lastPendulum.endY, this.lastPendulum.ballRadius)
+
+            this.#popTrail()
         }
     }
 
     /**
+     * Creates and appends the trail to the start if there are less than maxTrails
      * @param {number} x x coordinate
      * @param {number} y y coordinate
      * @param {number} radius radius
      */
     #createTrail(x, y, radius) {
-        // appends the trail to the start
-        if (this.trails.length < this.maxTrail) {
+        if (this.trails.length <= this.maxTrails) {
             this.trails.unshift(new Trail(this.ctx, x, y, radius))
         }
+    }
 
-        // removes the last trail
-        if (this.trails.length === this.maxTrail) {
+    /**
+     * Removes the last trail if there are more than maxTrails
+     */
+    #popTrail() {
+        if (this.trails.length > this.maxTrails) {
             this.trails.pop()
         }
     }
@@ -323,6 +373,7 @@ class ChaoticPendulum {
 
 class Trail {
     /**
+     * Creates a trail
      * @param {CanvasRenderingContext2D} ctx canvas 2d context
      * @param {number} x x coordinate
      * @param {number} y y coordinate
@@ -351,23 +402,16 @@ class Trail {
         this.ctx.closePath()
         this.ctx.restore()
     }
-
-    /**
-     * @param {number} t time elapsed since it was created
-     * @param {number} n max number of trails
-     */
-    setOpacityValue(t, n) {
-        this.opacity = 1 - t / n
-    }
 }
 
 /**
- * @param {string} attribute 
- * @param {any} initialValue 
- * @param {(value: number) => void} inputCallback 
- * @param {() => number} [reflectCallback = null]
+ * Creates an element representing a numeric attribute of the pendulum and returns the label and input
+ * @param {string} attribute pendulum attribute name (label)
+ * @param {any} initialValue initial value
+ * @returns an object containing the label and the input
  */
-function createHTMLPendulumAttributeNumber(attribute, initialValue, inputCallback, reflectCallback = null) {
+function createHTMLPendulumAttributeNumber(attribute, initialValue) {
+    // creates the elements
     const label = document.createElement('label')
     label.className = 'pendulum-number-attribute'
 
@@ -378,39 +422,38 @@ function createHTMLPendulumAttributeNumber(attribute, initialValue, inputCallbac
     span.className = 'pendulum-input-info'
     span.innerText = attribute + ':'
 
-    spanWrapper.appendChild(span)
-
     const input = document.createElement('input')
     input.className = 'pendulum-input-number'
     input.type = 'number'
     input.value = initialValue
-    input.addEventListener('input', e => inputCallback(parseFloat(e.target.value || 0)))
 
-    if (reflectCallback) updateInputs.push({ input, update: reflectCallback })
+    // appends the children
+    spanWrapper.appendChild(span)
 
     label.append(spanWrapper, input)
 
-    return label
+    return {
+        label,
+        input,
+    }
 }
 
 /**
- * @param {string} iconName 
- * @param {any} initialValue 
- * @param {(value: number) => void} inputCallback 
- * @returns 
+ * Creates an element representing a color attribute of the pendulum and returns the label and input
+ * @param {string} iconName icon name
+ * @param {any} initialValue initial value
+ * @returns an object containing the label and the input
  */
-function createHTMLPendulumAttributeColor(iconName, initialValue, inputCallback) {
+function createHTMLPendulumAttributeColor(iconName, initialValue) {
+    // creates the elements
     const label = document.createElement('label')
     label.className = 'pendulum-color-attribute'
-
 
     const iconWrapper = document.createElement('div')
     iconWrapper.className = 'icon-wrapper'
 
-    const icon = document.createElement('div')
+    const icon = document.createElement('span')
     icon.className = iconName
-
-    iconWrapper.appendChild(icon)
 
     const inputWrapper = document.createElement('div')
     inputWrapper.className = 'pendulum-input-color-wrapper'
@@ -419,129 +462,235 @@ function createHTMLPendulumAttributeColor(iconName, initialValue, inputCallback)
     input.className = 'pendulum-input-color'
     input.type = 'color'
     input.value = initialValue
-    input.addEventListener('input', e => inputCallback(e.target.value))
-
+    
+    // appends the children
+    iconWrapper.appendChild(icon)
     inputWrapper.appendChild(input)
-
 
     label.append(iconWrapper, inputWrapper)
 
-    return label
+    return {
+        label,
+        input,
+    }
 }
 
 /**
+ * Creates a button with an icon
+ * @param {string} buttonClass button class
+ * @param {string} iconName icon name
+ * @param {() => void} clickCallback callback to be executed when the button is clicked
+ * @returns a button
+ */
+function createHTMLPendulumButton(buttonClass, iconName, clickCallback) {
+    const button = document.createElement('button')
+    button.type = 'button'
+    button.className = buttonClass
+    button.addEventListener('click', clickCallback)
+
+    const icon = document.createElement('div')
+    icon.className = iconName
+
+    button.appendChild(icon)
+
+    return button
+}
+
+/**
+ * Creates an element representing the pendulum
  * @param {Pendulum} pendulum 
+ * @returns an element representing the pendulum
  */
 function createHTMLPendulum(pendulum) {
     const divPendulum = document.createElement('div')
     divPendulum.className = 'pendulum'
 
+    // container for the inputs
     const divPendulumAttributes = document.createElement('div')
     divPendulumAttributes.className = 'pendulum-attributes'
 
+    // container for the numeric inputs (helps to minimize the pendulum)
     const divPendulumNumberInputs = document.createElement('div')
     divPendulumNumberInputs.className = 'pendulum-number-inputs'
 
-    
-    const labelSpeed = createHTMLPendulumAttributeNumber('Speed', pendulum.angularSpeed,
-        function(value) {
-            pendulum.angularSpeed = value
-        }
-    )
+    // creates the numeric inputs
+    const labelSpeed = createHTMLPendulumAttributeNumber('Speed', pendulum.angularSpeed)
+    labelSpeed.input.addEventListener('input', function() {
+        const value = parseFloat(labelSpeed.input.value || 0)
+        pendulum.angularSpeed = value
+        chaoticPendulum.resetTrail()
+    })
 
-    const labelLength = createHTMLPendulumAttributeNumber('Length', pendulum.length,
-        function(value) {
-            pendulum.length = value
-            draw()
-        }
-    )
+    const labelLength = createHTMLPendulumAttributeNumber('Length', pendulum.length)
+    labelLength.input.min = 0
+    labelLength.input.addEventListener('input', function() {
+        const value = parseFloat(labelLength.input.value || 0)
+        pendulum.length = value < 0 ? 0 : value
+        draw()
+        chaoticPendulum.resetTrail()
+    })
+    labelLength.input.addEventListener('change', function() {
+        labelLength.input.value = pendulum.length
+    })
 
-    const labelDegrees = createHTMLPendulumAttributeNumber('Degrees', toDegrees(pendulum.radians),
-        function(value) {
-            pendulum.radians = toRadians(value)
-            draw()
-        },
-        () => toDegrees(pendulum.radians)
-    )
+    const labelDegrees = createHTMLPendulumAttributeNumber('Degrees', toDegrees(pendulum.radians).toFixed(3))
+    labelDegrees.input.min = 0
+    labelDegrees.input.max = 359
+    labelDegrees.input.addEventListener('input', function() {
+        const value = parseFloat(labelDegrees.input.value || 0)
+        pendulum.radians = (FULL_RADIANS + toRadians(value) % FULL_RADIANS) % FULL_RADIANS
+        draw()
+        chaoticPendulum.resetTrail()
+    })
+    labelDegrees.input.addEventListener('change', function() {
+        labelDegrees.input.value = toDegrees(pendulum.radians).toFixed(3)
+    })
 
-    divPendulumNumberInputs.append(labelSpeed, labelLength, labelDegrees)
+    addUpdateInput(labelDegrees.input, function() {
+        const formattedRadians = (FULL_RADIANS + pendulum.radians % FULL_RADIANS) % FULL_RADIANS
+        const degrees = toDegrees(formattedRadians).toFixed(3)
+        return degrees
+    })
 
+    // container for the color inputs
     const colorsWrapper = document.createElement('div')
     colorsWrapper.className = 'colors-wrapper'
 
-    const labelBallColor = createHTMLPendulumAttributeColor('icon-ball', pendulum.ballColor, function(value) {
-        pendulum.ballColor = value
+    // creates the color inputs
+    const labelBallColor = createHTMLPendulumAttributeColor(
+        'icon-ball',
+        pendulum.ballColor,
+        value => {
+            pendulum.ballColor = value
+            draw()
+        }
+    )
+    labelBallColor.input.addEventListener('input', function() {
+        pendulum.ballColor = labelBallColor.input.value
         draw()
     })
 
-    const labelLineColor = createHTMLPendulumAttributeColor('icon-line', pendulum.lineColor, function(value) {
-        pendulum.lineColor = value
+    const labelLineColor = createHTMLPendulumAttributeColor(
+        'icon-line',
+        pendulum.lineColor,
+        value => {
+            pendulum.lineColor = value
+            draw()
+        }
+    )
+    labelLineColor.input.addEventListener('input', function() {
+        pendulum.lineColor = labelLineColor.input.value
         draw()
     })
 
-    const btnRemovePendulum = document.createElement('button')
-    btnRemovePendulum.type = 'button'
-    btnRemovePendulum.className = 'btn-close-pendulum'
-    btnRemovePendulum.addEventListener('click', function() {
-        chaoticPendulum.removePendulum(pendulum)
-        divPendulum.remove()
-        draw()
-    })
+    // creates the buttons
+    const btnRemovePendulum = createHTMLPendulumButton(
+        'btn-remove-pendulum',
+        'icon-x',
+        () => {
+            chaoticPendulum.removePendulum(pendulum)
+            divPendulum.remove()
+            draw()
+        }
+    )
 
-    const iconX = document.createElement('div')
-    iconX.className = 'icon-x'
+    const btnMinimizePendulum = createHTMLPendulumButton(
+        'btn-minimize-pendulum',
+        'icon-chevron',
+        () => divPendulum.classList.toggle('minimized')
+    )
 
-    btnRemovePendulum.appendChild(iconX)
+    // appends the children
+    divPendulumNumberInputs.append(labelSpeed.label, labelLength.label, labelDegrees.label)
 
-    const btnMinimize = document.createElement('button')
-    btnMinimize.type = 'button'
-    btnMinimize.className = 'btn-minimize-pendulum'
-    btnMinimize.addEventListener('click', function() {
-        divPendulum.classList.toggle('minimized')
-    })
-
-    const iconChevron = document.createElement('div')
-    iconChevron.className = 'icon-chevron'
-
-    btnMinimize.appendChild(iconChevron)
-
-    colorsWrapper.append(labelBallColor, labelLineColor)
+    colorsWrapper.append(labelBallColor.label, labelLineColor.label)
 
     divPendulumAttributes.append(divPendulumNumberInputs, colorsWrapper)
 
-    divPendulum.append(divPendulumAttributes, btnRemovePendulum, btnMinimize)
+    divPendulum.append(divPendulumAttributes, btnRemovePendulum, btnMinimizePendulum)
 
     return divPendulum
 }
 
+/**
+ * Creates a pendulum and the HTML element representing it and returns it
+ * @returns an element representing the pendulum
+ */
 function createPendulum() {
     const pendulum = chaoticPendulum.createPendulum(DEFAULT_PENDULUM_LENGTH, DEFAULT_PENDULUM_SPEED, DEFAULT_PENDULUM_RADIANS)
 
     const HTMLPendulum = createHTMLPendulum(pendulum)
 
-    divPendulumParts.appendChild(HTMLPendulum)
+    return HTMLPendulum
 }
 
-function clearCanvas() {
+function addPendulum() {
+    divPendulumParts.appendChild(createPendulum())
+    draw()
+    chaoticPendulum.resetTrail()
+}
+
+function togglePendulumInfo() {
+    divPendulumInfoContainer.classList.toggle('closed')
+}
+
+/**
+ * Creates an update input object which updates the input value from the code to the HTML
+ * @param {HTMLInputElement} input input
+ * @param {() => void} updateCallback callback to be executed whenever the canvas is updated by the update() function
+ * @returns update input object
+ */
+function createUpdateObj(input, updateCallback) {
+    return {
+        input,
+        update: () => input.value = updateCallback(),
+    }
+}
+
+/**
+ * Creates an update input object and adds it to the update inputs array
+ * @param {HTMLInputElement} input input
+ * @param {() => void} updateCallback callback to be executed whenever the canvas is updated by the update() function
+ */
+function addUpdateInput(input, updateCallback) {
+    updateInputObjs.push(createUpdateObj(input, updateCallback))
+}
+
+/**
+ * Clears the canvas
+ */
+function clear() {
     ctx.clearRect(0, 0, canvas.width, canvas.height)
 }
 
+/**
+ * Draws the canvas
+ */
 function draw() {
-    clearCanvas()
+    clear()
     
-    ctx.setTransform(scale, 0, 0, scale, canvas.width / 2 + offsetX, canvas.height / 2 + offsetY)
+    // sets the context for drawing the pendulum in the right position and scale
+    ctx.setTransform(canvasObj.scale, 0, 0, canvasObj.scale, canvasObj.x, canvasObj.y)
+
     chaoticPendulum.draw()
-    resetContext()
+
+    // resets the context
+    ctx.setTransform(1, 0, 0, 1, 0, 0)
 }
 
+/**
+ * Updates the canvas
+ */
 function update() {
     chaoticPendulum.update()
-    updateInputs.forEach(input => input.input.value = input.update())
+
+    updateInputObjs.forEach(inputObj => inputObj.update())
 }
 
 function startAnimation() {
     animationFrame = requestAnimationFrame(updateAnimation)
 
+    // changes the visibility of the play and pause buttons
     btnPlay.classList.add('hidden')
     btnPause.classList.remove('hidden')
 }
@@ -556,6 +705,7 @@ function updateAnimation() {
 function stopAnimation() {
     cancelAnimationFrame(animationFrame)
 
+    // changes the visibility of the play and pause buttons
     btnPause.classList.add('hidden')
     btnPlay.classList.remove('hidden')
 }
@@ -574,22 +724,24 @@ function resizeCanvas() {
 }
 
 function setUpCanvas() {
-    resizeCanvas()
-    createPendulum()
+    const observer = new ResizeObserver(() => {
+        const oldWidth = canvas.width
+        const oldHeight = canvas.height
+
+        resizeCanvas()
+
+        const newX = canvasObj.x * canvas.width / oldWidth
+        const newY = canvasObj.y * canvas.height / oldHeight
+
+        canvasObj.setContextPosition(newX, newY)
+
+        draw()
+    })
+    observer.observe(canvas)
+
+    canvasObj.setContextPosition(canvas.width / 2, canvas.height / 2)
+    divPendulumParts.appendChild(createPendulum())
     draw()
-}
-
-function resetContext() {
-    ctx.setTransform(1, 0, 0, 1, 0, 0)
-}
-
-function translateCanvas(x, y) {
-    offsetX += x
-    offsetY += y
-}
-
-function zoomCanvas(zoom) {
-    scale *= zoom
 }
 
 function handleStartMove(x, y) {
@@ -605,7 +757,7 @@ function handleMove(x, y) {
     prevX = x
     prevY = y
     
-    translateCanvas(offsetX, offsetY)
+    canvasObj.translate(offsetX, offsetY)
     draw()
 }
 
@@ -613,6 +765,13 @@ function handleStopMove() {
     prevX = 0
     prevY = 0
     isHolding = false
+}
+
+function zoom(zoom) {
+    return function() {
+        canvasObj.zoom(zoom)
+        draw()
+    }
 }
 
 const FULL_RADIANS = 2 * Math.PI
@@ -625,25 +784,62 @@ const DEFAULT_PENDULUM_SPEED = 1
 const DEFAULT_PENDULUM_LENGTH = 50
 const DEFAULT_PENDULUM_RADIANS = Math.PI / 2
 
+const MIN_TRAILS = 0
+const MAX_TRAILS = 999_999
+
+const zoomIn = zoom(ZOOM_IN)
+const zoomOut = zoom(ZOOM_OUT)
+
 /** @type {HTMLCanvasElement} */
 const canvas = document.getElementById('chaotic-pendulum-canvas')
-const ctx = canvas.getContext('2d')
-
-const observer = new ResizeObserver(() => {
-    resizeCanvas()
-    draw()
-})
-observer.observe(canvas)
 
 const divPendulumInfoContainer = document.querySelector('.pendulum-info-container')
+// element where the pendulums are appended
 const divPendulumParts = document.querySelector('.pendulum-parts')
 
-const chaoticPendulum = new ChaoticPendulum(ctx, 0, 0)
-const updateInputs = []
+// button to close the divPendulumInfoContainer
+const btnClose = document.querySelector('#btn-close')
+// button to add a new pendulum
+const btnAddPendulum = document.querySelector('#btn-add')
+// button to start the animation
+const btnPlay = document.querySelector('#btn-play')
+// button to stop the animation
+const btnPause = document.querySelector('#btn-pause')
+// button to zoom in the canvas
+const btnZoomIn = document.querySelector('#btn-zoom-in')
+// button to zoom out the canvas
+const btnZoomOut = document.querySelector('#btn-zoom-out')
+// button to remove trail
+const btnRemoveTrail = document.querySelector('#btn-remove-trail')
+// button to add trail
+const btnAddTrail = document.querySelector('#btn-add-trail')
 
-let offsetX = 0
-let offsetY = 0
-let scale = 1
+// input to set the number of trails
+const inputTrails = document.querySelector('#input-trails')
+
+
+const updateInputObjs = []
+
+const ctx = canvas.getContext('2d')
+
+const chaoticPendulum = new ChaoticPendulum(ctx, 0, 0)
+
+const canvasObj = {
+    x: 0,
+    y: 0,
+    scale: 1,
+    setContextPosition(x, y) {
+        this.x = x
+        this.y = y
+    },
+    translate(x, y) {
+        this.x += x
+        this.y += y
+    },
+    zoom(zoom) {
+        this.scale *= zoom
+    }
+}
 
 let prevX = 0
 let prevY = 0
@@ -651,36 +847,46 @@ let isHolding = false
 
 let animationFrame = null
 
-const btnClose = document.querySelector('.btn-close')
-btnClose.addEventListener('click', function() {
-    divPendulumInfoContainer.classList.toggle('closed')
-})
+btnClose.addEventListener('click', togglePendulumInfo)
 
-const btnAddPart = document.querySelector('.btn-add')
-btnAddPart.addEventListener('click', function() {
-    createPendulum()
-    draw()
-})
+btnAddPendulum.addEventListener('click', addPendulum)
 
-const btnPlay = document.querySelector('.btn-play')
 btnPlay.addEventListener('click', startAnimation)
-
-const btnPause = document.querySelector('.btn-pause')
 btnPause.addEventListener('click', stopAnimation)
 
-const btnZoomIn = document.querySelector('.btn-zoom-in')
-btnZoomIn.addEventListener('click', function() {
-    zoomCanvas(ZOOM_IN)
-    draw()
+btnZoomIn.addEventListener('click', zoomIn)
+btnZoomOut.addEventListener('click', zoomOut)
+
+btnRemoveTrail.addEventListener('click', function() {
+    chaoticPendulum.maxTrails--
+    if (chaoticPendulum.maxTrails < MIN_TRAILS) chaoticPendulum.maxTrails = MIN_TRAILS
+    inputTrails.value = chaoticPendulum.maxTrails
+})
+btnAddTrail.addEventListener('click', function() {
+    chaoticPendulum.maxTrails++
+    if (chaoticPendulum.maxTrails > MAX_TRAILS) chaoticPendulum = MAX_TRAILS
+    inputTrails.value = chaoticPendulum.maxTrails
 })
 
-const btnZoomOut = document.querySelector('.btn-zoom-out')
-btnZoomOut.addEventListener('click', function() {
-    zoomCanvas(ZOOM_OUT)
-    draw()
+inputTrails.addEventListener('input', function() {
+    let value = parseInt(inputTrails.value)
+
+    if (!isNaN(value)) {
+        if (value < MIN_TRAILS) {
+            value = MIN_TRAILS
+        } else if (value > MAX_TRAILS) {
+            value = MAX_TRAILS
+        }
+
+        chaoticPendulum.maxTrails = value
+        draw()
+    }
+})
+inputTrails.addEventListener('change', function() {
+    inputTrails.value = chaoticPendulum.maxTrails
 })
 
-addEventListener('resize', resizeCanvas)
+// moving the canvas on mobile
 
 canvas.addEventListener('touchstart', function(event) {
     const touch = event.touches[0]
@@ -694,6 +900,7 @@ canvas.addEventListener('touchmove', function(event) {
 
 canvas.addEventListener('touchend', handleStopMove)
 
+// moving the canvas on computer
 
 canvas.addEventListener('mousedown',  function(event) {
     handleStartMove(event.x, event.y)
@@ -705,11 +912,7 @@ canvas.addEventListener('mousemove',  function(event) {
 })
 document.addEventListener('mouseup', handleStopMove)
 
-canvas.addEventListener('wheel', function(e) {
-    const zoom = e.deltaY < 0 ? ZOOM_IN : ZOOM_OUT
-
-    zoomCanvas(zoom)
-    draw()
-})
+// zooms the canvas
+canvas.addEventListener('wheel', e => (e.deltaY < 0 ? zoomIn : zoomOut)())
 
 setUpCanvas()

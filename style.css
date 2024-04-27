@@ -252,12 +252,50 @@ main {
     width: 100%;
 }
 
+/* trail input */
+.trails {
+    position: absolute;
+    top: 10px;
+}
+
+.trails-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: white;
+}
+
+.trails-container {
+    display: flex;
+    align-items: center;
+}
+
+#btn-remove-trail {
+    rotate: 90deg;
+}
+#btn-add-trail {
+    rotate: -90deg;
+}
+#btn-remove-trail .icon-chevron, #btn-add-trail .icon-chevron {
+    --color: white;
+    --size: 20px;
+}
+
+#input-trails {
+    width: 80px;
+    height: 100%;
+    padding: 4px 6px;
+    border-radius: 10px;
+}
+
 /* play and pause buttons */
-.btn-play, .btn-pause {
-    display: block;
+.play-pause-container {
     position: absolute;
     top: 20px;
     left: 50%;
+}
+#btn-play, #btn-pause {
+    position: absolute;
     translate: -50%;
     border-radius: 100%;
     border: solid white 2px;
@@ -266,7 +304,7 @@ main {
     &.hidden { display: none; }
 }
 
-.btn-play .icon-play, .btn-pause .icon-pause {
+#btn-play .icon-play, #btn-pause .icon-pause {
     --size: 20px;
     --color: var(--color-controller-play-pause);
 }
@@ -281,15 +319,15 @@ main {
     background-color: black;
 }
 
-.btn-zoom-in, .btn-zoom-out {
+#btn-zoom-in, #btn-zoom-out {
     display: block;
 }
 
-.btn-zoom-in {
+#btn-zoom-in {
     border-bottom: solid white 2px;
 }
 
-.btn-zoom-in .icon-plus, .btn-zoom-out .icon-minus {
+#btn-zoom-in .icon-plus, #btn-zoom-out .icon-minus {
     --color: white;
     --size: 30px;
 }
@@ -310,7 +348,7 @@ main {
 }
 
 /* close button */
-.btn-close {
+#btn-close {
     position: absolute;
     top: 0;
     left: 50%;
@@ -339,7 +377,7 @@ main {
     max-height: 0;
     box-shadow: none;
 
-    .btn-close {
+    #btn-close {
         --size: 40px;
 
         top: -10%;
@@ -417,7 +455,7 @@ main {
     height: 50%;
     text-transform: uppercase;
     text-align: center;
-    transition-duration: var(--time-minimize-pendulum);
+    transition-duration: opacity var(--time-minimize-pendulum);
 }
 
 .pendulum-input-info-wrapper {
@@ -485,7 +523,7 @@ main {
 
 /* pendulum buttons */
 
-.btn-close-pendulum {
+.btn-remove-pendulum {
     position: absolute;
     top: 0;
     right: 0;
@@ -566,7 +604,7 @@ main {
 }
 
 /* add button */
-.btn-add {
+#btn-add {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -579,14 +617,14 @@ main {
     color: black;
     background-color: white;
 }
-.btn-add .icon-add-wrapper {
+#btn-add .icon-add-wrapper {
     border: solid black 3px;
     border-radius: 100%;
 }
-.btn-add .icon-add-wrapper .icon-plus {
+#btn-add .icon-add-wrapper .icon-plus {
     --size: 30px;
 }
-.btn-add .btn-add-text {
+#btn-add .btn-add-text {
     font-size: 1.1rem;
     font-weight: 900;
 }
@@ -601,6 +639,17 @@ main {
         flex-direction: row-reverse;
     }
 
+    /* canvas controller */
+
+    /* trail input */
+    .trails {
+        position: absolute;
+        top: 20px;
+        left: 40px;
+    }
+
+    /* pendulum info */
+
     .pendulum-info-container {
         max-width: var(--width-pendulum-info);
         transition-property: max-width, box-shadow;
@@ -613,7 +662,9 @@ main {
         transition: left var(--time-close-pendulum-info);
     }
 
-    .btn-close {
+    /* close button */
+
+    #btn-close {
         left: 100%;
         translate: 0;
         rotate: 90deg;
@@ -621,6 +672,8 @@ main {
         border: none;
         background-color: var(--bg-color-pendulum-parts);
     }
+
+    /* pendulum info (closed) */
 
     .pendulum-info-container.closed {
         max-width: 0;
@@ -630,10 +683,12 @@ main {
             left: calc(var(--width-pendulum-info) * -1);
         }
 
-        .btn-close {
+        #btn-close {
             top: 0;
         }
     }
+
+    /* pendulum info content */
 
     .pendulum-parts-container {
         width: 100%;
@@ -652,16 +707,16 @@ main {
     /* canvas controller */
 
     /* play and pause buttons */
-    .btn-play, .btn-pause {
+    #btn-play, #btn-pause {
         border-width: 3px;
     }
 
-    .btn-play .icon-play, .btn-pause .icon-pause {
+    #btn-play .icon-play, #btn-pause .icon-pause {
         --size: 30px;
     }
 
     /* zoom in and out buttons */
-    .btn-zoom-in .icon-plus, .btn-zoom-out .icon-minus {
+    #btn-zoom-in .icon-plus, #btn-zoom-out .icon-minus {
         --size: 40px;
     }
 
@@ -673,7 +728,7 @@ main {
     }
 
     /* add button */
-    .btn-add .icon-add-wrapper .icon-plus {
+    #btn-add .icon-add-wrapper .icon-plus {
         --size: 40px;
     }
 }
