@@ -2,6 +2,8 @@
 
 A website that lets you draw anything (mostly random things) using circular motions.
 
+[Try Here](https://devswordfish.github.io/chaotic-pendulum/)
+
 ![preview-gif](https://github.com/devswordfish/chaotic-pendulum/assets/62572529/4887fee8-5d53-4297-981b-a845c4078fdc)
 
 ## How it works
