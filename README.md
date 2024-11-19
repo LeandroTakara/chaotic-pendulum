@@ -24,7 +24,7 @@ Everything is customizable, feel free to try anything!
 
 Clone the repo:
 ```
-git clone https://github.com/devswordfish/chaotic-pendulum.git
+git clone https://github.com/LeandroTakara/chaotic-pendulum.git
 ```
 
 ## License
